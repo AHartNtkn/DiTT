@@ -1,0 +1,4 @@
+{"role":"client","jsonrpc":"2.0","id":"kernel_info-1","method":"kernel_info","params":{}}
+{"role":"server","jsonrpc":"2.0","id":"kernel_info-1","result":{"language_name":"ditt","file_extension":".ditt"}}
+{"role":"client","jsonrpc":"2.0","id":"execute-1","method":"execute_request","params":{"session":"s1","code":"module M where\npostulate C : Cat\nid : (x : C) -> C = \\x. x\n","silent":false}}
+{"role":"server","jsonrpc":"2.0","id":"execute-1","result":{"status":"ok","execution_count":1,"events":[{"kind":"execute_result","repr":"id"}]}}

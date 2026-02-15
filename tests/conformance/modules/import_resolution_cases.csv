@@ -1,0 +1,11 @@
+case_id,stage,expected_outcome
+duplicate_import_aliases,check,reject
+overlapping_using_hiding,check,reject
+invalid_renaming_source,check,reject
+ambiguous_qualified_reference,check,reject
+shadowing_between_imports,check,reject
+renaming_valid_alias,check,accept
+import_cycle_direct,graph,reject
+import_cycle_transitive,graph,reject
+import_acyclic_chain,graph,accept
+incremental_dependents,graph,accept

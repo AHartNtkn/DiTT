@@ -1,0 +1,11 @@
+metric=parse_p95_ms
+value=35
+budget=50
+
+metric=check_p95_ms
+value=120
+budget=150
+
+metric=normalize_p95_ms
+value=80
+budget=120

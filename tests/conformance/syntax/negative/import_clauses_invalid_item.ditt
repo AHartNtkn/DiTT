@@ -1,0 +1,5 @@
+module Syntax.ImportClausesBad where
+
+import Std.Category using (+)
+postulate C : Cat
+id (x : C) : C = x

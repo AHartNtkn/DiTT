@@ -1,0 +1,4 @@
+module Syntax.DirectedHomFormsBad where
+
+postulate C : Cat
+bad (x : C) : x ->C] x = refl x

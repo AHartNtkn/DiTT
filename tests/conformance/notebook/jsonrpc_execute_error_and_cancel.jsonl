@@ -1,0 +1,5 @@
+{"role":"client","jsonrpc":"2.0","id":"execute-2","method":"execute_request","params":{"session":"s2","code":"id : (x : C) -> C =","silent":false}}
+{"role":"server","jsonrpc":"2.0","id":"execute-2","error":{"code":1001,"message":"Syntax error","data":{"category":"syntax"}}}
+{"role":"client","jsonrpc":"2.0","id":"execute-3","method":"execute_request","params":{"session":"s2","code":"long_running","silent":false}}
+{"role":"client","jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":"execute-3"}}
+{"role":"server","jsonrpc":"2.0","id":"execute-3","error":{"code":-32800,"message":"Request cancelled"}}

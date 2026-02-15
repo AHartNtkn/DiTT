@@ -1,0 +1,8 @@
+module Std.Functor where
+
+import Std.Category as Category
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) -> D

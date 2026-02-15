@@ -1,0 +1,4 @@
+module Syntax.LetFormsBad where
+
+postulate C : Cat
+id (x : C) : C = let y = x y

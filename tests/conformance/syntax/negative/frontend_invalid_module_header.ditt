@@ -1,0 +1,4 @@
+module Frontend.SurfaceBadHeader
+
+postulate C : Cat
+id : (x : C) -> C = \x. x

@@ -1,0 +1,7 @@
+uri=file:///tmp/conformance_lsp.ditt
+open=module Main where\npostulate C : Cat
+change=module Main where\npostulate C : Cat\nid : (x : C) -> C = \x. x
+save=1
+diagnostics=0
+cancel=42
+close=1

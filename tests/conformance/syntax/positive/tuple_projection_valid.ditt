@@ -1,0 +1,6 @@
+module Syntax.TupleProjection where
+
+postulate A : Cat
+postulate B : Cat
+fst (p : (A * B)) : A = p.1
+snd (p : (A * B)) : B = p.2

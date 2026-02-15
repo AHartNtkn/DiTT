@@ -1,0 +1,4 @@
+module Syntax.ReservedBad where
+
+postulate module : Cat
+id (x : module) : module = x

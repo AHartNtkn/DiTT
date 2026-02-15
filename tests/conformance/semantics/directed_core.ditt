@@ -1,0 +1,73 @@
+module Conformance.DirectedCore where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) -> D
+  Phi : (x : C) -> (y : C) -> Prop
+  Q : (x : C) -> (y : C) -> Prop
+  h : (z : C) -> Phi z z -> Q z z
+  Pred : (x : C) -> Prop
+
+diag_comp (c : C) (z : C) : (z ->[C] c) -> (z ->[C] c) =
+  \k. k
+
+compose_via_j (a : C^) (b : C) (c : C) (f : a ->[C] b) (g : b ->[C] c) : a ->[C] c =
+  (J (diag_comp c) [f]) g
+
+refl_intro (x : C) : x ->[C] x =
+  refl x
+
+j_comp (z : C) (phi : Phi z z) : Q z z =
+  J h [refl z]
+
+j_dep (a : C^) (b : C) (e : a ->[C] b) (phi : Phi b a) : Q a b =
+  J h [e]
+
+comp_left_id (a : C) (b : C) (f : a ->[C] b) : a ->[C] b =
+  compose_via_j a a b (refl a) f
+
+comp_right_id (a : C) (b : C) (f : a ->[C] b) : a ->[C] b =
+  compose_via_j a b b f (refl b)
+
+comp_assoc (a : C) (b : C) (c : C) (d : C) (f : a ->[C] b) (g : b ->[C] c) (k : c ->[C] d) : a ->[C] d =
+  compose_via_j a c d (compose_via_j a b c f g) k
+
+symmetry (a : C) (b : C) (requires_symmetry : (a ->[C] b) -> (b ->[C] a)) (e : a ->[C] b) : b ->[C] a =
+  requires_symmetry e
+
+restricted_cut (a : C) (all : end (x : C). Pred x) : Pred a =
+  all a
+
+subst_ty (x : C) : D =
+  (\y. F y) x
+
+rename_ty (x : C) : D =
+  (\renamed. F renamed) x
+
+weakening (x : C) (y : D) : C =
+  x
+
+exchange (x : C) (y : D) : (D * C) =
+  (y, x)
+
+C_op : Cat =
+  C^
+
+C_op_op : Cat =
+  C_op^
+
+op_involution (x : C) : x ->[C_op_op] x =
+  refl x
+
+beta (x : C) : C =
+  (\y. y) x
+
+eta (f : (x : C) -> C) : (x : C) -> C =
+  \x. f x
+
+congruence (a : C) (a2 : C) (b : D) (b2 : D) (u : a ->[C] a2) (v : b ->[D] b2) : (a, b) ->[(C * D)] (a2, b2) =
+  (u, v)
+
+norm_coherence (x : C) : C =
+  (\u. u) ((\v. v) x)

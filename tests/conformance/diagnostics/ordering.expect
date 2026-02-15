@@ -1,0 +1,2 @@
+order=category,severity,span.start,message
+dedup=true

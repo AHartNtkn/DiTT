@@ -1,0 +1,4 @@
+module Syntax.IdentifierDigitStartBad where
+
+postulate 1C : Cat
+id (x : 1C) : 1C = x

@@ -1,0 +1,104 @@
+module Conformance.NegativeCases where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) -> D
+  Phi : (x : C) -> (y : C) -> Prop
+  Q : (x : C) -> (y : C) -> Prop
+  h : (z : C) -> Phi z z -> Q z z
+  Pred : (x : C) -> Prop
+  Any : Prop
+
+refl_wrong (x : C) (y : C) (e : x ->[C] y) : x ->[C] y =
+  refl x
+
+j_comp_wrong (z : C) (phi : Phi z z) (extra : Q z z) : Q z z =
+  J h [phi]
+
+j_dep_wrong (a : C^) (b : C) (e : a ->[C] b) (phi : Phi a b) : Q a b =
+  h a phi
+
+comp_left_wrong (a : C) (b : C) (f : a ->[C] b) : a ->[C] b =
+  refl a
+
+comp_right_wrong (a : C) (b : C) (f : a ->[C] b) : a ->[C] b =
+  refl b
+
+comp_assoc_wrong (a : C) (b : C) (c : C) (d : C) (f : a ->[C] b) (g : b ->[C] c) (k : c ->[C] d) : d ->[C] a =
+  f
+
+symmetry_forbidden (a : C) (b : C) (e : a ->[C] b) : b ->[C] a =
+  e
+
+unrestricted_cut_forbidden (k : (x : C) -> Pred x) : Any =
+  k
+
+subst_wrong (x : C) : D =
+  x
+
+rename_wrong (x : C) : D =
+  x
+
+weakening_wrong (x : C) (y : D) : C =
+  y
+
+exchange_wrong (x : C) (y : D) : (D * C) =
+  (x, y)
+
+op_involution_wrong (x : C) : x ->[C^] x =
+  refl x
+
+beta_wrong (x : C) (y : C) : C =
+  refl x
+
+eta_wrong (f : (x : C) -> C) (x : C) : C =
+  f
+
+congruence_wrong (a : C) (a2 : C) (b : D) (b2 : D) (u : a ->[C] a2) (v : b ->[D] b2) : (a2, b2) ->[(C * D)] (a, b) =
+  (u, v)
+
+norm_coherence_wrong (x : C) (y : C) : C =
+  refl x
+
+functor_map_identity_wrong (x : C) : D =
+  x
+
+functor_map_composition_wrong (a : C) (b : C) (f : a ->[C] b) : D =
+  f
+
+transport_identity_wrong (x : C) : x ->[C] x =
+  x
+
+transport_composition_wrong (a : C) (b : C) (f : a ->[C] b) : b ->[C] a =
+  f
+
+end_coend_adjunction_wrong (k : (x : C) -> Pred x) : Any =
+  k
+
+end_intro_wrong (x : C) : end (u : C). Pred u =
+  x
+
+end_elim_wrong (x : C) : Pred x =
+  x
+
+coend_intro_wrong (x : C) : coend (u : C). Pred u =
+  x
+
+coend_elim_wrong (x : C) : Pred x =
+  x
+
+yoneda_wrong (x : C) : Pred x =
+  x
+
+co_yoneda_wrong (x : C) : Pred x =
+  x
+
+fubini_exchange_wrong (x : C) : Pred x =
+  x
+
+subject_reduction_wrong (x : C) : Pred x =
+  x
+
+full_cut_via_implication (k : (x : C) -> Pred x) : Any =
+  k

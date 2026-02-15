@@ -1,0 +1,8 @@
+module Syntax.EndCoendForms where
+
+postulate C : Cat
+postulate P : (x : C) -> Prop
+e_end_ascii : end (x : C). P x = e_end_ascii
+e_coend_ascii : coend (x : C). P x = e_coend_ascii
+e_end_unicode : ∫ (x : C). P x = e_end_unicode
+e_coend_unicode : ∫^ (x : C). P x = e_coend_unicode

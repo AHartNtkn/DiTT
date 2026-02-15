@@ -1,0 +1,9 @@
+module Syntax.LocalModules where
+
+postulate C : Cat
+
+module Inner where
+  postulate D : Cat
+  inner_id : (x : D) -> D = \x. x
+
+outer_id : (x : C) -> C = \x. x

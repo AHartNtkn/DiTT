@@ -1,0 +1,5 @@
+module Syntax.AnnotatedPatternsBad where
+
+postulate A : Cat
+postulate B : Cat
+bad (p : (A * B)) : A = \(x : , y : B). x

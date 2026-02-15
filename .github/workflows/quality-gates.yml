@@ -1,0 +1,102 @@
+name: quality-gates
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_perf:
+        description: "Run ignored performance contracts"
+        type: boolean
+        default: false
+      run_mutation:
+        description: "Run mutation testing gate"
+        type: boolean
+        default: false
+      run_fuzz:
+        description: "Run fuzz smoke gate"
+        type: boolean
+        default: false
+      run_live_contracts:
+        description: "Validate live quality reports with executable contracts"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  perf-contracts:
+    if: ${{ inputs.run_perf == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run performance contracts
+        run: bash scripts/run_perf_contracts.sh
+
+  mutation-gate:
+    if: ${{ inputs.run_mutation == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-mutants
+        run: cargo install cargo-mutants --locked
+
+      - name: Run mutation gate
+        env:
+          MUTATION_SCORE_THRESHOLD: "80"
+        run: bash scripts/check_mutation_gate.sh
+
+  fuzz-smoke:
+    if: ${{ inputs.run_fuzz == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+
+      - name: Run fuzz smoke
+        env:
+          FUZZ_REQUIRED: "0"
+        run: bash scripts/fuzz_smoke.sh
+
+  quality-live-contracts:
+    if: ${{ inputs.run_live_contracts == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-mutants
+        if: ${{ inputs.run_mutation == true }}
+        run: cargo install cargo-mutants --locked
+
+      - name: Install cargo-fuzz
+        if: ${{ inputs.run_fuzz == true }}
+        run: cargo install cargo-fuzz --locked
+
+      - name: Run live quality contracts
+        env:
+          QUALITY_REPORT_DIR: target/quality-reports
+          RUN_MUTATION: ${{ inputs.run_mutation && '1' || '0' }}
+          RUN_FUZZ: ${{ inputs.run_fuzz && '1' || '0' }}
+          RUN_PERF: ${{ inputs.run_perf && '1' || '0' }}
+          FUZZ_REQUIRED: "0"
+          MUTATION_SCORE_THRESHOLD: "80"
+        run: bash scripts/run_quality_contracts_live.sh

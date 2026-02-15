@@ -1,0 +1,4 @@
+module Conformance.CliInvalid where
+
+postulate C : Cat
+id (x : C) : C =

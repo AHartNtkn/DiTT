@@ -1,0 +1,26 @@
+module Conformance.Figure13Rules where
+
+postulate
+  C : Cat
+  D : Cat
+
+unused_var_neq_probe : Prop =
+  (x : C) -> (y : D) -> (y ->[D] y)
+
+unused_top_probe : Prop =
+  (x : C) -> Top -> Top
+
+unused_app_probe : Prop =
+  (x : C) -> (f : (z : D) -> z ->[D] z) -> (z : D) -> (z ->[D] z)
+
+unused_pair_probe : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] y) * (y ->[D] y))
+
+unused_proj_probe : Prop =
+  (x : C) -> (y : D) -> (y ->[D] y)
+
+unused_lambda_probe : Prop =
+  (x : C) -> (z : D) -> (z ->[D] z)
+
+unused_op_probe : Prop =
+  (x : C) -> (y : D) -> (y ->[D^] y)

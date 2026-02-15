@@ -1,0 +1,5 @@
+module Syntax.PrecedenceProductArrowBad where
+
+postulate A : Cat
+postulate C : Cat
+h : A * -> C = \x. x

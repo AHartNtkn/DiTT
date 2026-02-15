@@ -1,0 +1,4 @@
+module Syntax.WhereBlockBad where
+
+postulate C : Cat
+id (x : C) : C = x where helper : C = x

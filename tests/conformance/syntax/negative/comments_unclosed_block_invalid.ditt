@@ -1,0 +1,5 @@
+module Syntax.CommentsBad where
+
+postulate C : Cat
+/* unclosed block comment
+id (x : C) : C = x

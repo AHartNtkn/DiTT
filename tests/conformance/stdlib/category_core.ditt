@@ -1,0 +1,4 @@
+module Std.Category where
+
+postulate C : Cat
+id (x : C) : x ->[C] x = refl x

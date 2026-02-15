@@ -1,0 +1,4 @@
+module Frontend.SurfaceValidLet where
+
+postulate C : Cat
+id (x : C) : C = let y : C = x in y

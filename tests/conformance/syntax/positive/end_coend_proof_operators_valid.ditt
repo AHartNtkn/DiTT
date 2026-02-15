@@ -1,0 +1,16 @@
+module Syntax.EndCoendProofOperators where
+
+postulate
+  C : Cat
+  P : (x : C) -> Prop
+  Q : Prop
+  alpha : (x : C) -> P x
+  omega : ∫ (x : C). P x
+  kappa : (x : C) -> P x -> Q
+
+pack_end : ∫ (x : C). P x = end alpha
+unpack_end_unicode : (x : C) -> P x = end⁻¹ omega
+unpack_end_ascii : (x : C) -> P x = end^-1 omega
+pack_coend : ((x : C) -> P x -> Q) -> Q = \k. coend k
+unpack_coend_unicode : (x : C) -> P x -> Q = coend⁻¹ kappa
+unpack_coend_ascii : (x : C) -> P x -> Q = coend^-1 kappa

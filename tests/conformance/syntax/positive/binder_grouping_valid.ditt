@@ -1,0 +1,4 @@
+module Syntax.BinderGrouping where
+
+postulate C : Cat
+pair : (x y : C) -> C = \x y. x

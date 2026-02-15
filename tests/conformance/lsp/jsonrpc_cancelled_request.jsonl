@@ -1,0 +1,5 @@
+{"role":"client","jsonrpc":"2.0","id":10,"method":"initialize","params":{"capabilities":{}}}
+{"role":"server","jsonrpc":"2.0","id":10,"result":{"capabilities":{"definitionProvider":true}}}
+{"role":"client","jsonrpc":"2.0","id":42,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/cancel.ditt"},"position":{"line":3,"character":2}}}
+{"role":"client","jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":42}}
+{"role":"server","jsonrpc":"2.0","id":42,"error":{"code":-32800,"message":"Request cancelled"}}

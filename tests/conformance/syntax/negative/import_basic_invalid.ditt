@@ -1,0 +1,5 @@
+module Syntax.ImportBasicBad where
+
+import
+postulate C : Cat
+id (x : C) : C = x

@@ -1,0 +1,5 @@
+module Syntax.LambdaForms where
+
+postulate C : Cat
+id_ascii : (x : C) -> C = \x. x
+id_unicode : (x : C) -> C = λx. x

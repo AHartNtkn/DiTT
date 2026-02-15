@@ -1,0 +1,4 @@
+module Syntax.LocalModulesBad where
+
+module Inner
+  postulate C : Cat

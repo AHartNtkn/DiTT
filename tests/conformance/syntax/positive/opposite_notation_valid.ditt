@@ -1,0 +1,4 @@
+module Syntax.OppositeNotation where
+
+postulate C : Cat
+id_op (x : C^) : C^ = x

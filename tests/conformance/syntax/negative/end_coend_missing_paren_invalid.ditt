@@ -1,0 +1,5 @@
+module Syntax.EndCoendFormsBad where
+
+postulate C : Cat
+postulate P : (x : C) -> Prop
+e : end x : C. P x = e

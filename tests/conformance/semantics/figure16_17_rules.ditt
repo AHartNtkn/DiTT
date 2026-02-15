@@ -1,0 +1,33 @@
+module Conformance.Figure16_17Rules where
+
+postulate
+  C : Cat
+  P : (x : C) -> Prop
+  Q : (x : C) -> Prop
+
+end_intro_probe : Prop =
+  ((x : C) -> P x) -> end (x : C). P x
+
+end_elim_probe : Prop =
+  end (x : C). P x -> (x : C) -> P x
+
+end_iso_left_probe : Prop =
+  ((x : C) -> P x) -> (x : C) -> P x
+
+end_iso_right_probe : Prop =
+  end (x : C). P x -> end (x : C). P x
+
+end_nat_l_probe : Prop =
+  end (x : C). P x -> end (x : C). Q x
+
+end_din_l_probe : Prop =
+  end (x : C). P x -> (x : C) -> Q x
+
+end_din_r_probe : Prop =
+  ((x : C) -> P x) -> end (x : C). Q x
+
+end_nat_r_probe : Prop =
+  end (x : C). P x -> end (x : C). Q x
+
+end_functoriality_probe : Prop =
+  ((x : C) -> P x) -> end (x : C). Q x

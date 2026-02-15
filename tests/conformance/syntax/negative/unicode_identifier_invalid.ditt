@@ -1,0 +1,4 @@
+module Syntax.UnicodeBad where
+
+postulate 😀 : Cat
+id (x : 😀) : 😀 = x

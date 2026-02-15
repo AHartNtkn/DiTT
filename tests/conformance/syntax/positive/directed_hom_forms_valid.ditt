@@ -1,0 +1,5 @@
+module Syntax.DirectedHomForms where
+
+postulate C : Cat
+refl_ascii (x : C) : x ->[C] x = refl x
+refl_unicode (x : C) : x →[C] x = refl x

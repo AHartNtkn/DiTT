@@ -1,0 +1,5 @@
+module Syntax.ArrowFormsBad where
+
+postulate C : Cat
+postulate D : Cat
+f_bad : C -> -> D = \x. x

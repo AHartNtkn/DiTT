@@ -1,0 +1,5 @@
+module Syntax.LetForms where
+
+postulate C : Cat
+id_typed (x : C) : C = let y : C = x in y
+id_untyped (x : C) : C = let y = x in y

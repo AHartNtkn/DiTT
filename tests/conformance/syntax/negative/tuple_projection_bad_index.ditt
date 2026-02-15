@@ -1,0 +1,5 @@
+module Syntax.TupleProjectionBad where
+
+postulate A : Cat
+postulate B : Cat
+bad (p : (A * B)) : A = p.3

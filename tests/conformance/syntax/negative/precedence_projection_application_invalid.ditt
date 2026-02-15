@@ -1,0 +1,6 @@
+module Syntax.PrecedenceProjectionApplicationBad where
+
+postulate A : Cat
+postulate B : Cat
+postulate f : A -> B
+app (p : (A * A)) : B = f .1

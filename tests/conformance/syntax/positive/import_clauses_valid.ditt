@@ -1,0 +1,5 @@
+module Syntax.ImportClauses where
+
+import Std.Category as Category using (id) hiding (tmp) renaming (id to identity)
+postulate C : Cat
+identity (x : C) : C = x

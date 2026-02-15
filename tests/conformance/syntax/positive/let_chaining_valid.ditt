@@ -1,0 +1,4 @@
+module Syntax.LetChaining where
+
+postulate C : Cat
+id (x : C) : C = let y = x; z = y in z

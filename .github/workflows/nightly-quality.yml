@@ -1,0 +1,51 @@
+name: nightly-quality
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nightly-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-mutants
+        run: cargo install cargo-mutants --locked
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+
+      - name: Run ignored performance contracts
+        env:
+          QUALITY_REPORT_DIR: target/quality-reports
+          PERF_REPORT_PATH: target/quality-reports/perf_report.txt
+        run: bash scripts/run_perf_contracts.sh
+
+      - name: Run mutation gate
+        env:
+          MUTATION_SCORE_THRESHOLD: "80"
+          QUALITY_REPORT_DIR: target/quality-reports
+          MUTATION_REPORT_PATH: target/quality-reports/mutation_report.json
+        run: bash scripts/check_mutation_gate.sh
+
+      - name: Run fuzz smoke
+        env:
+          FUZZ_REQUIRED: "0"
+          QUALITY_REPORT_DIR: target/quality-reports
+          FUZZ_REPORT_PATH: target/quality-reports/fuzz_report.txt
+        run: bash scripts/fuzz_smoke.sh
+
+      - name: Validate live quality reports with contracts
+        env:
+          DITT_QUALITY_REPORT_DIR: target/quality-reports
+          DITT_REQUIRE_LIVE_REPORTS: "1"
+        run: cargo test --test contracts_quality_gate_registry quality_gate_live_reports_if_present_satisfy_thresholds -- --nocapture

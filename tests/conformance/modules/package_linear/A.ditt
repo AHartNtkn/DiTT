@@ -1,0 +1,3 @@
+module A where
+postulate C : Cat
+idA : (x : C) -> C = \x. x

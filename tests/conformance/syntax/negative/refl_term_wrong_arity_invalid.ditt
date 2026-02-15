@@ -1,0 +1,5 @@
+module Syntax.ReflTermWrongArity where
+
+postulate C : Cat
+
+bad_refl (x : C) : x ->[C] x = refl x x

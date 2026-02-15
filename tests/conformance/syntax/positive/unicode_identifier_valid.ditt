@@ -1,0 +1,4 @@
+module Σyntax.Unicode where
+
+postulate C : Cat
+δid (x : C) : C = x

@@ -1,0 +1,4 @@
+module Conformance.CliValid where
+
+postulate C : Cat
+id (x : C) : C = x

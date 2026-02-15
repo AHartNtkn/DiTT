@@ -1,0 +1,6 @@
+{"role":"client","jsonrpc":"2.0","id":"init-1","method":"initialize","params":{"capabilities":{}}}
+{"role":"server","jsonrpc":"2.0","id":"init-1","result":{"capabilities":{"hoverProvider":true}}}
+{"role":"client","jsonrpc":"2.0","id":"hover-1","method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/unknown.ditt"},"position":{"line":42,"character":7}}}
+{"role":"server","jsonrpc":"2.0","id":"hover-1","error":{"code":-32602,"message":"invalid params: document is not open"}}
+{"role":"client","jsonrpc":"2.0","id":"unknown-1","method":"textDocument/unsupportedMethod","params":{}}
+{"role":"server","jsonrpc":"2.0","id":"unknown-1","error":{"code":-32601,"message":"method not found"}}

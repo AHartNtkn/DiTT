@@ -1,0 +1,4 @@
+module Syntax.TopShared where
+
+u_ascii : Top = u_ascii
+u_unicode : ⊤ = u_unicode

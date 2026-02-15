@@ -1,0 +1,6 @@
+{"role":"client","jsonrpc":"2.0","id":100,"method":"initialize","params":{"capabilities":{"textDocument":{"completion":{"dynamicRegistration":false}}}}}
+{"role":"server","jsonrpc":"2.0","id":100,"result":{"capabilities":{"hoverProvider":true,"completionProvider":{"triggerCharacters":["."]}}}}
+{"role":"client","jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/inc.ditt","languageId":"ditt","version":1,"text":"module M where\npostulate C : Cat\nid : (x : C) -> C = \\x. x\n"}}}
+{"role":"client","jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/inc.ditt","version":2},"contentChanges":[{"text":"module M where\npostulate C : Cat\nid : (x : C) -> C = \\x. x\nidem : (x : C) -> C = id x\n"}]}}
+{"role":"client","jsonrpc":"2.0","id":101,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/inc.ditt"},"position":{"line":3,"character":1}}}
+{"role":"server","jsonrpc":"2.0","id":101,"result":{"items":[{"label":"id","detail":"(x : C) -> C"},{"label":"idem","detail":"(x : C) -> C"}]}}

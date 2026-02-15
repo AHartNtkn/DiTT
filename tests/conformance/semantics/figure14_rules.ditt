@@ -1,0 +1,25 @@
+module Conformance.Figure14Rules where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) -> D
+  P : (x : C) -> Prop
+
+cov_top_probe : Prop =
+  (x : C) -> Top
+
+cov_prod_probe : Prop =
+  (x : C) -> (((y : D) -> (y ->[D] F x)) * (x ->[C] x))
+
+cov_exp_probe : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] F x) -> (x ->[C] x))
+
+cov_hom_probe : Prop =
+  (x : C) -> (y : D) -> (y ->[D] F x)
+
+cov_quantifier_probe : Prop =
+  end (x : C). P x
+
+contra_probe : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] F x) -> (x ->[C] x))

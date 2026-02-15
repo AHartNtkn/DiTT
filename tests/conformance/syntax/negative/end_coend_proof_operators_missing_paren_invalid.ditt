@@ -1,0 +1,8 @@
+module Syntax.EndCoendProofOperatorsBad where
+
+postulate
+  C : Cat
+  P : (x : C) -> Prop
+  alpha : (x : C) -> P x
+
+bad_pack : ∫ (x : C). P x = end(alpha

@@ -1,0 +1,59 @@
+module Conformance.Figure11Rules where
+
+postulate
+  C : Cat
+  D : Cat
+  P : (x : C) -> Prop
+  Q : (x : C) -> Prop
+  R : (x : C) -> Prop
+  Phi : (x : C) -> (y : C) -> Prop
+  Q2 : (x : C) -> (y : C) -> Prop
+  h_diag : (z : C) -> Phi z z -> Q2 z z
+  F : (x : C) -> D
+  h_end : end (x : C). P x
+  lift_coend : (x : C) -> P x
+
+var_probe (x : C) (p : P x) : P x =
+  p
+
+wk_probe (x : C) (p : P x) (q : Q x) : P x =
+  p
+
+top_probe (u : Top) : Top =
+  u
+
+idx_probe (x : C) : D =
+  (\z. F z) x
+
+contr_probe (x : C) (p : P x) : (P x * P x) =
+  (p, p)
+
+prod_probe (x : C) (p : P x) (q : Q x) : (P x * Q x) =
+  (p, q)
+
+exp_probe (x : C) (f : P x -> Q x) (g : Q x -> R x) : P x -> R x =
+  \p. g (f p)
+
+end_probe (x : C) : P x =
+  (end^-1 h_end) x
+
+coend_probe : coend (x : C). P x =
+  coend lift_coend
+
+cut_din_probe (a : C^) (b : C) (e : a ->[C] b) (pba : Phi b a) : Q2 a b =
+  (J h_diag [e]) pba
+
+cut_nat_probe (x : C) (f : P x -> Q x) (g : Q x -> R x) : P x -> R x =
+  \p. g (f p)
+
+refl_probe (x : C) : x ->[C] x =
+  refl x
+
+j_probe (a : C^) (b : C) (e : a ->[C] b) (pba : Phi b a) : Q2 a b =
+  J h_diag [e]
+
+j_comp_probe (z : C) (phi : Phi z z) : Q2 z z =
+  J h_diag [refl z]
+
+j_eq_probe (a : C^) (b : C) (c : C) (f : a ->[C] b) (g : b ->[C] c) : Q2 a c =
+  J h_diag [(J (\z. \k. k) [f]) g]

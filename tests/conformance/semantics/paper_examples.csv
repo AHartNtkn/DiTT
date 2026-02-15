@@ -1,0 +1,19 @@
+id,name,contract_id,expected
+Ex2_4DerivationPredicate,Example 2.4 Derivation of a predicate,tests/contracts_paper_examples_dedicated.rs::ex2_4_derivation_predicate_contract,Derivable
+Ex2_10OppositePredicate,Example 2.10 Opposite predicate,tests/contracts_paper_examples_dedicated.rs::ex2_10_opposite_predicate_contract,Derivable
+Ex3_1Composition,Example 3.1 Composition in a category,tests/contracts_paper_examples_dedicated.rs::ex3_1_composition_contract,Derivable
+Ex3_2FunctorialAction,Example 3.2 Functorial action on morphisms,tests/contracts_paper_examples_dedicated.rs::ex3_2_functorial_action_contract,Derivable
+Ex3_3Transport,Example 3.3 Transport,tests/contracts_paper_examples_dedicated.rs::ex3_3_transport_contract,Derivable
+Ex3_4PairOfRewrites,Example 3.4 Pair of rewrites,tests/contracts_paper_examples_dedicated.rs::ex3_4_pair_of_rewrites_contract,Derivable
+Ex3_5HigherDimensionalRewriting,Example 3.5 Higher-dimensional rewriting,tests/contracts_paper_examples_dedicated.rs::ex3_5_higher_dimensional_rewriting_contract,Derivable
+Ex3_6ExistenceOfSingletons,Example 3.6 Existence of singletons,tests/contracts_paper_examples_dedicated.rs::ex3_6_existence_of_singletons_contract,Derivable
+Ex3_7InternalNaturality,Example 3.7 Internal naturality for entailments,tests/contracts_paper_examples_dedicated.rs::ex3_7_internal_naturality_contract,Derivable
+Ex3_8InternalDinaturality,Example 3.8 Internal dinaturality for entailments,tests/contracts_paper_examples_dedicated.rs::ex3_8_internal_dinaturality_contract,Derivable
+Ex3_9EndCoendRulesWithTerms,Example 3.9 Rules for (co)ends with terms,tests/contracts_paper_examples_dedicated.rs::ex3_9_end_coend_rules_with_terms_contract,Derivable
+Ex3_10NaturalDeductionCoends,Example 3.10 Natural deduction-style rules for coends,tests/contracts_paper_examples_dedicated.rs::ex3_10_natural_deduction_coends_contract,Derivable
+Ex3_11ImplicationTransitivity,Example 3.11 Transitivity of implication,tests/contracts_paper_examples_dedicated.rs::ex3_11_implication_transitivity_contract,Derivable
+Ex6_1CoYonedaLemma,Example 6.1 (co)Yoneda lemma,tests/contracts_paper_examples_dedicated.rs::ex6_1_coyoneda_contract,Derivable
+Ex6_2PresheavesCartesianClosed,Example 6.2 Presheaves are cartesian closed,tests/contracts_paper_examples_dedicated.rs::ex6_2_presheaves_cartesian_closed_contract,Derivable
+Ex6_3PointwiseRightKan,Example 6.3 Pointwise formula for right Kan extensions,tests/contracts_paper_examples_dedicated.rs::ex6_3_pointwise_right_kan_contract,Derivable
+Ex6_4FubiniRuleForEnds,Example 6.4 Fubini rule for ends,tests/contracts_paper_examples_dedicated.rs::ex6_4_fubini_rule_for_ends_contract,Derivable
+Ex6_5ImplicationRespectsLimits,Example 6.5 (->) respects limits,tests/contracts_paper_examples_dedicated.rs::ex6_5_implication_respects_limits_contract,Derivable

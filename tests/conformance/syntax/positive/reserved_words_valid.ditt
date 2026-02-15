@@ -1,0 +1,4 @@
+module Syntax.ReservedValid where
+
+postulate C : Cat
+module1 (x : C) : C = x

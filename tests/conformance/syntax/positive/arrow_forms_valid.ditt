@@ -1,0 +1,6 @@
+module Syntax.ArrowForms where
+
+postulate C : Cat
+postulate D : Cat
+f_ascii : C -> D = \x. x
+g_unicode : C → D = λx. x

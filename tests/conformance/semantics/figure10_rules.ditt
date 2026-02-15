@@ -1,0 +1,21 @@
+module Conformance.Figure10Rules where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) -> D
+
+cov_hom_probe : Prop =
+  (x : C) -> (y : D) -> (y ->[D] F x)
+
+cov_prod_probe : Prop =
+  (x : C) -> (((y : D) -> (y ->[D] F x)) * (x ->[C] x))
+
+cov_exp_probe : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] F x) -> (x ->[C] x))
+
+contra_probe : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] F x) -> (x ->[C] x))
+
+unused_probe : Prop =
+  (x : C) -> (y : D) -> (y ->[D] y)

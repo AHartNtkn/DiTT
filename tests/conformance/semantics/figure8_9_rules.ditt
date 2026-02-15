@@ -1,0 +1,15 @@
+module Conformance.Figure8_9Rules where
+
+postulate
+  C : Cat
+  D : Cat
+  P : (x : C) -> Prop
+
+ctx_var_here_probe (x : C) : C =
+  x
+
+ctx_var_there_probe (x : C) (y : D) : C =
+  x
+
+prop_ctx_probe (x : C) (p : P x) (q : P x) : P x =
+  p

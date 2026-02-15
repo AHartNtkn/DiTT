@@ -1,0 +1,5 @@
+module Syntax.ArrowRightAssocBad where
+
+postulate A : Cat
+postulate B : Cat
+k : A -> -> B = \x. x

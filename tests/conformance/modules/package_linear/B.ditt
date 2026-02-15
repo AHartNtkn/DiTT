@@ -1,0 +1,3 @@
+module B where
+import A
+idB : (x : C) -> C = idA x

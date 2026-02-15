@@ -1,0 +1,4 @@
+encoding=ditt-derivation-v1
+judgment=refl_intro
+payload={"rule":"DirectedRefl","term":"\\x. refl x","metadata":{"producer":"compat"}}
+extra_field_ignored=1

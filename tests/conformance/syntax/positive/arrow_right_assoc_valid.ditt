@@ -1,0 +1,6 @@
+module Syntax.ArrowRightAssoc where
+
+postulate A : Cat
+postulate B : Cat
+postulate C : Cat
+k : A -> B -> C = \x. x

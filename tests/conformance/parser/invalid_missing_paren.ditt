@@ -1,0 +1,4 @@
+module Conformance.InvalidMissingParen where
+
+postulate C : Cat
+broken (x : C : C = x

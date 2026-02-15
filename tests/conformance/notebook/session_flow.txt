@@ -1,0 +1,7 @@
+session=1
+execute=postulate C : Cat
+execute=C
+interrupt=1
+restart=1
+execute=C
+shutdown=1

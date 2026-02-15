@@ -1,0 +1,5 @@
+module Syntax.DuplicateTopLevelBad where
+
+postulate C : Cat
+id (x : C) : C = x
+id (x : C) : C = x

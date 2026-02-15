@@ -1,0 +1,4 @@
+module Frontend.SurfaceValidUnicodeLambda where
+
+postulate C : Cat
+id : (x : C) -> C = λx. x

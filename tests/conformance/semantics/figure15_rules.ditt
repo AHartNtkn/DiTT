@@ -1,0 +1,26 @@
+module Conformance.Figure15Rules where
+
+postulate
+  C : Cat
+  P : (x : C) -> Prop
+  Q : (x : C) -> Prop
+  R : (x : C) -> Prop
+  Phi : (x : C) -> (y : C) -> Prop
+
+assoc_nat_din_nat_probe : Prop =
+  (x : C) -> (P x -> Q x) -> (Q x -> R x) -> (P x -> R x)
+
+cut_coherence_probe : Prop =
+  (x : C) -> (P x -> Q x) -> (P x -> Q x)
+
+cut_nat_id_l_probe : Prop =
+  (x : C) -> (P x -> P x)
+
+cut_nat_id_r_probe : Prop =
+  (x : C) -> (P x -> P x)
+
+cut_din_id_l_probe : Prop =
+  (z : C) -> (Phi z z -> Phi z z)
+
+cut_din_id_r_probe : Prop =
+  (z : C) -> (Phi z z -> Phi z z)

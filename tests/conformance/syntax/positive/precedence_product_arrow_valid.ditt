@@ -1,0 +1,6 @@
+module Syntax.PrecedenceProductArrow where
+
+postulate A : Cat
+postulate B : Cat
+postulate C : Cat
+h : A * B -> C = \x. x

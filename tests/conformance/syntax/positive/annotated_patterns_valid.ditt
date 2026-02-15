@@ -1,0 +1,5 @@
+module Syntax.AnnotatedPatterns where
+
+postulate A : Cat
+postulate B : Cat
+fst : (p : (A * B)) -> A = \(x : A, y : B). x

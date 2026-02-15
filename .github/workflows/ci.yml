@@ -1,0 +1,46 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  red-phase-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Rustfmt check
+        run: cargo fmt --all -- --check
+
+      - name: Compile all tests
+        run: cargo test --no-run
+
+      - name: Red-phase contract check
+        run: bash scripts/check_red_phase.sh
+
+      - name: Paper parity metadata check
+        run: bash scripts/check_paper_parity.sh
+
+      - name: Finite-model oracle check
+        run: cargo test --test contracts_finite_model_oracle
+
+      - name: Schema compatibility check
+        run: bash scripts/check_schema_compat.sh

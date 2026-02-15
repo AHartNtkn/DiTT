@@ -1,0 +1,6 @@
+module Syntax.Comments where
+
+// line comment
+postulate C : Cat
+/* block comment */
+id (x : C) : C = x

@@ -1,0 +1,5 @@
+module Syntax.ImportBasic where
+
+import Std.Category
+postulate C : Cat
+id (x : C) : C = x

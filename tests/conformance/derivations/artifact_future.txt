@@ -1,0 +1,3 @@
+encoding=ditt-derivation-v999
+judgment=refl_intro
+payload={"rule":"DirectedRefl","term":"\\x. refl x"}

@@ -1,0 +1,22 @@
+module Paper.Variance where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) -> D
+  P : (x : C) -> Prop
+
+ex2_6_covariant_hom : Prop =
+  (x : C^) -> (y : C) -> (x ->[C] y)
+
+ex2_6_mixed_variance_pair : Prop =
+  (x : C) -> (y : C) -> (z : C) -> ((x ->[C] y) * (y ->[C] z))
+
+ex2_6_polarized_implication : Prop =
+  (x : C^) -> (z : C^) -> ((x ->[C] z) -> (z ->[C] x))
+
+ex2_7_variance_formal_shape : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] F x) -> P x)
+
+ex2_11_contravariance_formal_shape : Prop =
+  (x : C) -> (y : D) -> ((y ->[D] F x) -> P x)

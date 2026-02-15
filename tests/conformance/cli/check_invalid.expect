@@ -1,0 +1,5 @@
+exit_code=1
+stdout_empty=true
+stderr_empty=false
+json_required=true
+status=error

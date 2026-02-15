@@ -1,0 +1,10 @@
+category,severity,summary
+Parser,Error,Unclosed delimiter
+Parser,Error,General parse failure
+TypeTheory,Error,Directed J variance restriction violation
+TypeTheory,Error,Unrestricted cut not admissible
+TypeTheory,Error,Symmetry law not derivable
+TypeTheory,Error,Type mismatch or arity error
+NameResolution,Error,Duplicate or conflicting name definition
+Artifacts,Error,Artifact schema is newer than supported version
+Parser,Warning,Recoverable syntax issue

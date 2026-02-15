@@ -1,0 +1,8 @@
+{"role":"client","jsonrpc":"2.0","id":"kernel_info-2","method":"kernel_info","params":{}}
+{"role":"server","jsonrpc":"2.0","id":"kernel_info-2","result":{"language_name":"ditt","file_extension":".ditt","mimetype":"text/x-ditt"}}
+{"role":"client","jsonrpc":"2.0","id":"execute-10","method":"execute_request","params":{"session":"s10","code":"postulate C : Cat\nid : (x : C) -> C = \\x. x\n","silent":false,"store_history":true}}
+{"role":"server","jsonrpc":"2.0","id":"execute-10","result":{"status":"ok","execution_count":1,"events":[{"kind":"execute_result","repr":"id"}]}}
+{"role":"client","jsonrpc":"2.0","id":"complete-1","method":"complete_request","params":{"code":"id","cursor":2}}
+{"role":"server","jsonrpc":"2.0","id":"complete-1","result":{"matches":["id"],"cursor_start":0,"cursor_end":2}}
+{"role":"client","jsonrpc":"2.0","id":"inspect-1","method":"inspect_request","params":{"code":"id","cursor":1}}
+{"role":"server","jsonrpc":"2.0","id":"inspect-1","result":{"found":true,"contents":"id : (x : C) -> C","cursor_start":0,"cursor_end":2}}

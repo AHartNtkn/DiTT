@@ -1,0 +1,5 @@
+module Syntax.ImplicitNamedArgsBad where
+
+postulate C : Cat
+id : {x : C} -> C = \{x}. x
+use : (y : C) -> C = \y. id {x y}

@@ -1,0 +1,5 @@
+module Syntax.ImportAliasBad where
+
+import Std.Category as
+postulate C : Cat
+id (x : C) : C = x

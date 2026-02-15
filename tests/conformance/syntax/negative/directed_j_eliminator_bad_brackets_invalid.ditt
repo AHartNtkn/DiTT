@@ -1,0 +1,9 @@
+module Syntax.DirectedJEliminatorBadBrackets where
+
+postulate
+  C : Cat
+  Phi : (x : C) -> (y : C) -> Prop
+  P : (x : C) -> (y : C) -> Prop
+  h : (z : C) -> Phi z z -> P z z
+
+j_elim_bad (a : C^) (b : C) (e : a ->[C] b) (phi : Phi b a) : P a b = J h [e

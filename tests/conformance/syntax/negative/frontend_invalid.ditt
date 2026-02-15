@@ -1,0 +1,4 @@
+module Frontend.SurfaceBad where
+
+postulate C : Cat
+id : (x : C) -> C =

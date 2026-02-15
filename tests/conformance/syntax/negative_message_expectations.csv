@@ -1,0 +1,6 @@
+fixture,required_fragment
+conformance/syntax/negative/module_header_missing_where.ditt,where
+conformance/syntax/negative/lambda_missing_dot_invalid.ditt,dot
+conformance/syntax/negative/import_alias_missing_name.ditt,identifier
+conformance/syntax/negative/tuple_projection_bad_index.ditt,index
+conformance/syntax/negative/end_coend_missing_paren_invalid.ditt,paren

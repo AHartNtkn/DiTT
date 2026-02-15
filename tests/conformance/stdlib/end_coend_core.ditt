@@ -1,0 +1,7 @@
+module Std.EndCoend where
+
+import Std.Category as Category
+
+postulate
+  C : Cat
+  P : (x : C) -> Prop

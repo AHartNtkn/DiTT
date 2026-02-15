@@ -1,0 +1,33 @@
+section,item,contract_id,status,notes
+2.4,Derivation of a predicate,tests/contracts_paper_examples_dedicated.rs::ex2_4_derivation_predicate_contract,covered,Dedicated fixture + dedicated test
+2.6,Variance,tests/contracts_variance_inference.rs::ex2_6_variance_contract,covered,Dedicated variance API contract
+2.7,Variance formally,tests/contracts_variance_inference.rs::ex2_7_variance_formal_contract,covered,Dedicated variance API contract
+2.10,Opposite predicate,tests/contracts_paper_examples_dedicated.rs::ex2_10_opposite_predicate_contract,covered,Dedicated fixture + dedicated test
+2.11,Contravariance formally,tests/contracts_variance_inference.rs::ex2_11_contravariance_formal_contract,covered,Dedicated variance API contract
+3.1,Composition in a category,tests/contracts_paper_examples_dedicated.rs::ex3_1_composition_contract,covered,Dedicated fixture + dedicated test
+3.2,Functorial action on morphisms,tests/contracts_paper_examples_dedicated.rs::ex3_2_functorial_action_contract,covered,Dedicated fixture + dedicated test
+3.3,Transport,tests/contracts_paper_examples_dedicated.rs::ex3_3_transport_contract,covered,Dedicated fixture + dedicated test
+3.4,Pair of rewrites,tests/contracts_paper_examples_dedicated.rs::ex3_4_pair_of_rewrites_contract,covered,Dedicated fixture + dedicated test
+3.5,Higher-dimensional rewriting,tests/contracts_paper_examples_dedicated.rs::ex3_5_higher_dimensional_rewriting_contract,covered,Dedicated fixture + dedicated test
+3.6,Existence of singletons,tests/contracts_paper_examples_dedicated.rs::ex3_6_existence_of_singletons_contract,covered,Dedicated fixture + dedicated test
+3.7,Internal naturality for entailments,tests/contracts_paper_examples_dedicated.rs::ex3_7_internal_naturality_contract,covered,Dedicated fixture + dedicated test
+3.8,Internal dinaturality for entailments,tests/contracts_paper_examples_dedicated.rs::ex3_8_internal_dinaturality_contract,covered,Dedicated fixture + dedicated test
+3.9,Rules for (co)ends with terms,tests/contracts_paper_examples_dedicated.rs::ex3_9_end_coend_rules_with_terms_contract,covered,Dedicated fixture + dedicated test
+3.10,Natural deduction-style rules for coends,tests/contracts_paper_examples_dedicated.rs::ex3_10_natural_deduction_coends_contract,covered,Dedicated fixture + dedicated test
+3.11,Transitivity of implication,tests/contracts_paper_examples_dedicated.rs::ex3_11_implication_transitivity_contract,covered,Dedicated fixture + dedicated test
+6.1,(co)Yoneda lemma,tests/contracts_paper_examples_dedicated.rs::ex6_1_coyoneda_contract,covered,Dedicated fixture + dedicated test
+6.2,Presheaves are cartesian closed,tests/contracts_paper_examples_dedicated.rs::ex6_2_presheaves_cartesian_closed_contract,covered,Dedicated fixture + dedicated test
+6.3,Pointwise formula for right Kan extensions,tests/contracts_paper_examples_dedicated.rs::ex6_3_pointwise_right_kan_contract,covered,Dedicated fixture + dedicated test
+6.4,Fubini rule for ends,tests/contracts_paper_examples_dedicated.rs::ex6_4_fubini_rule_for_ends_contract,covered,Dedicated fixture + dedicated test
+6.5,(->) respects limits,tests/contracts_paper_examples_dedicated.rs::ex6_5_implication_respects_limits_contract,covered,Dedicated fixture + dedicated test
+B.1,Contractibility of singletons,tests/contracts_paper_appendix_examples.rs::exb_1_contractibility_of_singletons_contract,covered,Appendix example executable contract
+B.2,Internal naturality for natural transformations,tests/contracts_paper_appendix_examples.rs::exb_2_internal_naturality_for_naturals_contract,covered,Appendix example executable contract
+B.3,Identity natural transformation,tests/contracts_paper_appendix_examples.rs::exb_3_identity_natural_transformation_contract,covered,Appendix example executable contract
+B.4,Composition of natural transformations,tests/contracts_paper_appendix_examples.rs::exb_4_composition_of_natural_transformations_contract,covered,Appendix example executable contract
+B.5,Directed equality in opposite categories,tests/contracts_paper_appendix_examples.rs::exb_5_directed_equality_in_opposite_categories_contract,covered,Appendix example executable contract
+C.1,Elimination for coends,tests/contracts_paper_appendix_examples.rs::exc_1_elimination_for_coends_contract,covered,Appendix example executable contract
+C.2,Introduction for coends with a term,tests/contracts_paper_appendix_examples.rs::exc_2_introduction_for_coends_with_term_contract,covered,Appendix example executable contract
+C.3,Introduction for coends with a dinatural variable,tests/contracts_paper_appendix_examples.rs::exc_3_introduction_for_coends_with_dinatural_variable_contract,covered,Appendix example executable contract
+D.1,Pointwise formula for left Kan extensions,tests/contracts_paper_appendix_examples.rs::exd_1_pointwise_formula_for_left_kan_contract,covered,Appendix example executable contract
+D.2,Right lifts in profunctors,tests/contracts_paper_appendix_examples.rs::exd_2_right_lifts_in_profunctors_contract,covered,Appendix example executable contract
+D.3,Associativity of profunctor composition,tests/contracts_paper_appendix_examples.rs::exd_3_associativity_of_profunctor_composition_contract,covered,Appendix example executable contract

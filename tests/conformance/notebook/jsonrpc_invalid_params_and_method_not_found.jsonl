@@ -1,0 +1,4 @@
+{"role":"client","jsonrpc":"2.0","id":"exec-1","method":"execute_request","params":{"session":"nb-negative","code":"id :","silent":false,"store_history":true}}
+{"role":"server","jsonrpc":"2.0","id":"exec-1","error":{"code":-32001,"message":"execution failed: parse error"}}
+{"role":"client","jsonrpc":"2.0","id":"unknown-1","method":"notebook/unsupportedMethod","params":{}}
+{"role":"server","jsonrpc":"2.0","id":"unknown-1","error":{"code":-32601,"message":"method not found"}}

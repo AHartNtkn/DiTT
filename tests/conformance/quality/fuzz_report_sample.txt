@@ -1,0 +1,17 @@
+target=parser
+status=ok
+executions=48000
+crashes=0
+timeouts=0
+
+target=cli_protocol
+status=ok
+executions=32000
+crashes=0
+timeouts=0
+
+target=lsp_protocol
+status=ok
+executions=36000
+crashes=0
+timeouts=0

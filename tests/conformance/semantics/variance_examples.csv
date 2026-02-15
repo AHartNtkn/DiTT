@@ -1,0 +1,4 @@
+id,name,contract_id,expected
+Ex2_6Variance,Example 2.6 Variance,tests/contracts_variance_inference.rs::ex2_6_variance_contract,Derivable
+Ex2_7VarianceFormal,Example 2.7 Variance formally,tests/contracts_variance_inference.rs::ex2_7_variance_formal_contract,Derivable
+Ex2_11ContravarianceFormal,Example 2.11 Contravariance formally,tests/contracts_variance_inference.rs::ex2_11_contravariance_formal_contract,Derivable

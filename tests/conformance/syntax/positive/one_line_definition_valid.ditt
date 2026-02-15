@@ -1,0 +1,4 @@
+module Syntax.OneLineDefinition where
+
+postulate C : Cat
+id : (x : C) -> C = \x. x

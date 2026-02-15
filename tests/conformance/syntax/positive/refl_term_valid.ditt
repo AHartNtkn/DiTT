@@ -1,0 +1,6 @@
+module Syntax.ReflTerm where
+
+postulate C : Cat
+
+refl_ascii (x : C) : x ->[C] x = refl x
+refl_paren (x : C) : x ->[C] x = refl (x)

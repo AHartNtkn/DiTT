@@ -1,0 +1,8 @@
+module Conformance.InvalidRules where
+
+postulate
+  C : Cat
+  D : Cat
+
+wrong_type (x : C) : D = x
+wrong_symmetry (a : C) (b : C) (e : a ->[C] b) : b ->[C] a = e

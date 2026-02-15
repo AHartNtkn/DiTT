@@ -1,0 +1,3 @@
+module Main where
+import B
+main : (x : C) -> C = idB x
