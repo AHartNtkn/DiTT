@@ -57,6 +57,7 @@ dependencies = [
  "proptest",
  "regex",
  "serde_json",
+ "unicode-ident",
 ]
 
 [[package]]
