@@ -1029,12 +1029,6 @@ enum ReplPhase {
 #[derive(Debug, Clone, Copy)]
 enum NotebookPhase {
     Execute,
-    KernelInfo,
-    Complete,
-    Inspect,
-    Interrupt,
-    Restart,
-    Shutdown,
 }
 
 fn module_error_from_bundle(err: LanguageError) -> LanguageError {
@@ -1077,12 +1071,6 @@ fn notebook_error(message: String, phase: NotebookPhase) -> LanguageError {
     };
     let variant = match phase {
         NotebookPhase::Execute => NotebookError::Execute { diagnostics },
-        NotebookPhase::KernelInfo => NotebookError::KernelInfo { diagnostics },
-        NotebookPhase::Complete => NotebookError::Complete { diagnostics },
-        NotebookPhase::Inspect => NotebookError::Inspect { diagnostics },
-        NotebookPhase::Interrupt => NotebookError::Interrupt { diagnostics },
-        NotebookPhase::Restart => NotebookError::Restart { diagnostics },
-        NotebookPhase::Shutdown => NotebookError::Shutdown { diagnostics },
     };
     LanguageError::Interaction(InteractionError::Notebook(variant))
 }

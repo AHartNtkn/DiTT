@@ -507,26 +507,6 @@ impl ExprParser {
         }
     }
 
-    fn matching_paren_index(&self, open_index: usize) -> Option<usize> {
-        if self.tokens.get(open_index).map(|t| t.text.as_str()) != Some("(") {
-            return None;
-        }
-        let mut depth = 0isize;
-        for idx in open_index..self.tokens.len() {
-            match self.tokens[idx].text.as_str() {
-                "(" => depth += 1,
-                ")" => {
-                    depth -= 1;
-                    if depth == 0 {
-                        return Some(idx);
-                    }
-                }
-                _ => {}
-            }
-        }
-        None
-    }
-
     fn parse_pattern(&mut self) -> Result<SurfacePattern, LanguageError> {
         if self.eat_symbol("_") {
             return Ok(SurfacePattern::Wildcard);
@@ -850,12 +830,12 @@ impl Lexer for SyntaxEngine {
             } else {
                 let mut lexeme = ch.to_string();
                 let mut end = start + ch.len_utf8();
-                if ch == '-' {
-                    if let Some((i, '>')) = chars.peek().copied() {
-                        lexeme = "->".to_string();
-                        end = i + 1;
-                        chars.next();
-                    }
+                if ch == '-'
+                    && let Some((i, '>')) = chars.peek().copied()
+                {
+                    lexeme = "->".to_string();
+                    end = i + 1;
+                    chars.next();
                 }
                 Token {
                     kind: TokenKind::Symbol,
@@ -1783,15 +1763,15 @@ fn tokenize_for_parser(source: &str) -> Result<Vec<PToken>, LanguageError> {
             });
             continue;
         }
-        if ch == '-' {
-            if let Some((i, '>')) = chars.peek().copied() {
-                chars.next();
-                out.push(PToken {
-                    text: "->".to_string(),
-                    span: Span { start, end: i + 1 },
-                });
-                continue;
-            }
+        if ch == '-'
+            && let Some((i, '>')) = chars.peek().copied()
+        {
+            chars.next();
+            out.push(PToken {
+                text: "->".to_string(),
+                span: Span { start, end: i + 1 },
+            });
+            continue;
         }
         out.push(PToken {
             text: ch.to_string(),
@@ -2751,14 +2731,12 @@ fn validate_identifier(name: &str) -> Result<(), LanguageError> {
 
 fn span_for_line(source: &str, line_index: usize) -> Span {
     let mut start = 0usize;
-    let mut line_no = 0usize;
-    for line in source.lines() {
+    for (line_no, line) in source.lines().enumerate() {
         if line_no == line_index {
             let end = start + line.len().max(1);
             return Span { start, end };
         }
         start += line.len() + 1;
-        line_no += 1;
     }
     Span { start: 0, end: 1 }
 }

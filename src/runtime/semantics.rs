@@ -334,44 +334,37 @@ impl TypeChecker for SemanticEngine {
                     ));
                 }
 
-                if let Some(expected) = cat_type_from_annotation(ty, &cat_constants) {
-                    if expected != CatType::Var("Cat".to_string()) {
-                        if let Ok(inferred) = infer_expr_type(value, &infer_env, &cat_constants) {
-                            let matches_inferred = cat_type_equivalent(&expected, &inferred)
-                                || cat_type_contains_top(&expected)
-                                || cat_type_contains_top(&inferred)
-                                || prop_shape_compatible(&expected, &inferred);
-                            let matches_lambda = lambda_matches_expected_type(
-                                value,
-                                &expected,
-                                &infer_env,
-                                &cat_constants,
-                            );
-                            let suppress_non_derivable_mismatch = is_non_derivable_name(name)
-                                || module.name.as_ref().is_some_and(|n| {
-                                    n.to_string().contains("Negative.TypeMismatch")
-                                });
-                            let suppress_non_derivable_mismatch = suppress_non_derivable_mismatch
-                                && !contains_structured_tuple_pattern(value)
-                                && !module
-                                    .name
-                                    .as_ref()
-                                    .is_some_and(|n| n.to_string().contains("InvalidRules"));
-                            if !matches_inferred
-                                && !matches_lambda
-                                && !suppress_non_derivable_mismatch
-                            {
-                                diagnostics.push(diagnostic(
-                                    "TypeTheory",
-                                    "type_mismatch",
-                                    format!(
-                                        "definition '{}' has type {}, but body infers as {}",
-                                        name, expected, inferred
-                                    ),
-                                    None,
-                                ));
-                            }
-                        }
+                if let Some(expected) = cat_type_from_annotation(ty, &cat_constants)
+                    && expected != CatType::Var("Cat".to_string())
+                    && let Ok(inferred) = infer_expr_type(value, &infer_env, &cat_constants)
+                {
+                    let matches_inferred = cat_type_equivalent(&expected, &inferred)
+                        || cat_type_contains_top(&expected)
+                        || cat_type_contains_top(&inferred)
+                        || prop_shape_compatible(&expected, &inferred);
+                    let matches_lambda =
+                        lambda_matches_expected_type(value, &expected, &infer_env, &cat_constants);
+                    let suppress_non_derivable_mismatch = is_non_derivable_name(name)
+                        || module
+                            .name
+                            .as_ref()
+                            .is_some_and(|n| n.to_string().contains("Negative.TypeMismatch"));
+                    let suppress_non_derivable_mismatch = suppress_non_derivable_mismatch
+                        && !contains_structured_tuple_pattern(value)
+                        && !module
+                            .name
+                            .as_ref()
+                            .is_some_and(|n| n.to_string().contains("InvalidRules"));
+                    if !matches_inferred && !matches_lambda && !suppress_non_derivable_mismatch {
+                        diagnostics.push(diagnostic(
+                            "TypeTheory",
+                            "type_mismatch",
+                            format!(
+                                "definition '{}' has type {}, but body infers as {}",
+                                name, expected, inferred
+                            ),
+                            None,
+                        ));
                     }
                 }
             }
@@ -628,30 +621,13 @@ impl TypeChecker for SemanticEngine {
                 }
 
                 let premises = if rule == InferenceRule::CutNat
-                    && module
-                        .name
-                        .as_ref()
-                        .is_some_and(|n| n.to_string().contains("Rules.JEq.Derivation"))
                     && name == "probe"
-                {
-                    vec![
-                        RuleApplication {
-                            rule: InferenceRule::Var,
-                            premises: vec![],
-                        },
-                        RuleApplication {
-                            rule: InferenceRule::Var,
-                            premises: vec![],
-                        },
-                    ]
-                } else if rule == InferenceRule::CutNat
                     && module.name.as_ref().is_some_and(|n| {
                         let module_name = n.to_string();
-                        module_name.contains("Rules.Figure15CutNatIdL.Derivation")
+                        module_name.contains("Rules.JEq.Derivation")
+                            || module_name.contains("Rules.Figure15CutNatIdL.Derivation")
                             || module_name.contains("Rules.Figure15CutNatIdR.Derivation")
-                    })
-                    && name == "probe"
-                {
+                    }) {
                     vec![
                         RuleApplication {
                             rule: InferenceRule::Var,
@@ -904,8 +880,7 @@ impl Normalizer for SemanticEngine {
         let env = declaration_type_map_from_typed(module, &cat_constants);
         let mut seen = HashSet::new();
         let mut norm = normalize_expr(module, term, &HashMap::new(), &mut seen);
-        let inferred_input_ty =
-            infer_expr_type(term, &env, &cat_constants).unwrap_or_else(|_| CatType::Top);
+        let inferred_input_ty = infer_expr_type(term, &env, &cat_constants).unwrap_or(CatType::Top);
         if inferred_input_ty == CatType::Top {
             norm = Expr::var("!");
         }
@@ -1567,7 +1542,7 @@ fn contains_cross_quantifier_elim(
     match expr {
         Expr::EndElim { proof, witness } => {
             if let Expr::Var(name) = proof.as_ref()
-                && env.get(name).is_some_and(|ty| mentions_coend(ty))
+                && env.get(name).is_some_and(mentions_coend)
             {
                 return true;
             }
@@ -1586,7 +1561,7 @@ fn contains_cross_quantifier_elim(
             ..
         } => {
             if let Expr::Var(name) = proof.as_ref()
-                && env.get(name).is_some_and(|ty| mentions_end(ty))
+                && env.get(name).is_some_and(mentions_end)
             {
                 return true;
             }
@@ -3250,56 +3225,56 @@ fn normalize_var_expr(
     if seen.contains(name) {
         return Expr::var(name);
     }
-    if let Some(decl) = module.lookup_declaration(name) {
-        if let Declaration::Definition { binders, value, .. } = &decl.declaration {
-            if name == "map"
-                && binders.len() == 1
-                && matches!(value, Expr::Var(var_name) if var_name == &binders[0].name)
-            {
-                return Expr::var(name);
-            }
-            let mut expanded = value.clone();
-            if !binders.is_empty() {
-                expanded = Expr::lambda(binders.clone(), expanded);
-            }
-            if allow_implicit_fallback
-                && let Expr::Lambda {
-                    binders: lambda_binders,
-                    ..
-                } = &expanded
-            {
-                let mut fallback_keys = subst.keys().cloned().collect::<Vec<_>>();
-                fallback_keys.sort();
-                let fallback_values = fallback_keys
-                    .into_iter()
-                    .filter_map(|k| subst.get(&k).cloned())
-                    .collect::<Vec<_>>();
-                let mut fallback_index = 0usize;
-                let mut inferred_args = Vec::new();
-                for binder in lambda_binders {
-                    if binder.explicitness != Explicitness::Implicit {
-                        break;
-                    }
-                    if let Some(arg) = subst.get(&binder.name) {
-                        inferred_args.push(arg.clone());
-                        continue;
-                    }
-                    if let Some(arg) = fallback_values.get(fallback_index) {
-                        inferred_args.push(arg.clone());
-                        fallback_index += 1;
-                        continue;
-                    }
+    if let Some(decl) = module.lookup_declaration(name)
+        && let Declaration::Definition { binders, value, .. } = &decl.declaration
+    {
+        if name == "map"
+            && binders.len() == 1
+            && matches!(value, Expr::Var(var_name) if var_name == &binders[0].name)
+        {
+            return Expr::var(name);
+        }
+        let mut expanded = value.clone();
+        if !binders.is_empty() {
+            expanded = Expr::lambda(binders.clone(), expanded);
+        }
+        if allow_implicit_fallback
+            && let Expr::Lambda {
+                binders: lambda_binders,
+                ..
+            } = &expanded
+        {
+            let mut fallback_keys = subst.keys().cloned().collect::<Vec<_>>();
+            fallback_keys.sort();
+            let fallback_values = fallback_keys
+                .into_iter()
+                .filter_map(|k| subst.get(&k).cloned())
+                .collect::<Vec<_>>();
+            let mut fallback_index = 0usize;
+            let mut inferred_args = Vec::new();
+            for binder in lambda_binders {
+                if binder.explicitness != Explicitness::Implicit {
                     break;
                 }
-                if !inferred_args.is_empty() {
-                    expanded = Expr::app(expanded, inferred_args);
+                if let Some(arg) = subst.get(&binder.name) {
+                    inferred_args.push(arg.clone());
+                    continue;
                 }
+                if let Some(arg) = fallback_values.get(fallback_index) {
+                    inferred_args.push(arg.clone());
+                    fallback_index += 1;
+                    continue;
+                }
+                break;
             }
-            seen.insert(name.to_string());
-            let norm = normalize_expr(module, &expanded, subst, seen);
-            seen.remove(name);
-            return norm;
+            if !inferred_args.is_empty() {
+                expanded = Expr::app(expanded, inferred_args);
+            }
         }
+        seen.insert(name.to_string());
+        let norm = normalize_expr(module, &expanded, subst, seen);
+        seen.remove(name);
+        return norm;
     }
     Expr::var(name)
 }
@@ -3662,82 +3637,6 @@ fn predicate_body<'a>(module: &'a TypedModule, predicate: &str) -> Option<&'a Ex
         .lookup_declaration(predicate)?
         .declaration
         .definition_value()
-}
-
-fn follow_position<'a>(expr: &'a Expr, path: &[usize]) -> Option<&'a Expr> {
-    if path.is_empty() {
-        return Some(expr);
-    }
-    let (head, tail) = (path[0], &path[1..]);
-    let child = match expr {
-        Expr::Lambda { body, .. } => (head == 0).then_some(body.as_ref()),
-        Expr::App {
-            function,
-            arguments,
-        } => {
-            if head == 0 {
-                Some(function.as_ref())
-            } else {
-                arguments.get(head - 1)
-            }
-        }
-        Expr::Hom {
-            category,
-            source,
-            target,
-        } => match head {
-            0 => Some(category.as_ref()),
-            1 => Some(source.as_ref()),
-            2 => Some(target.as_ref()),
-            _ => None,
-        },
-        Expr::Product { left, right } | Expr::Pair { left, right } => match head {
-            0 => Some(left.as_ref()),
-            1 => Some(right.as_ref()),
-            _ => None,
-        },
-        Expr::Arrow { parameter, result } => match head {
-            0 => Some(parameter.as_ref()),
-            1 => Some(result.as_ref()),
-            _ => None,
-        },
-        Expr::End { body, .. } | Expr::Coend { body, .. } => (head == 1).then_some(body.as_ref()),
-        Expr::Opposite(inner) => (head == 0).then_some(inner.as_ref()),
-        Expr::EndIntro { body, .. } => (head == 1).then_some(body.as_ref()),
-        Expr::EndElim { proof, witness } => match head {
-            0 => Some(proof.as_ref()),
-            1 => Some(witness.as_ref()),
-            _ => None,
-        },
-        Expr::CoendIntro { witness, body } => match head {
-            0 => Some(witness.as_ref()),
-            1 => Some(body.as_ref()),
-            _ => None,
-        },
-        Expr::CoendElim {
-            proof,
-            continuation,
-            ..
-        } => match head {
-            0 => Some(proof.as_ref()),
-            1 => Some(continuation.as_ref()),
-            _ => None,
-        },
-        Expr::Refl { term } => (head == 0).then_some(term.as_ref()),
-        Expr::JElim { transport, path } => match head {
-            0 => Some(transport.as_ref()),
-            1 => Some(path.as_ref()),
-            _ => None,
-        },
-        Expr::Proj { tuple, .. } => (head == 0).then_some(tuple.as_ref()),
-        Expr::Let(let_expr) => match head {
-            0 => Some(let_expr.value.as_ref()),
-            1 => Some(let_expr.body.as_ref()),
-            _ => None,
-        },
-        Expr::Var(_) | Expr::Top => None,
-    }?;
-    follow_position(child, tail)
 }
 
 fn follow_position_with_polarity<'a>(

@@ -42,7 +42,11 @@ assoc (a : C) (b : C) (c : C) (d : C) (f : a ->[C] b) (g : b ->[C] c) (k : c ->[
 "#;
     let (_syntax, semantics, typed) = compile_with_engines(source);
     let result = semantics.evaluate_term(&typed, &Expr::var("assoc"));
-    assert!(result.is_ok(), "evaluate_term must not stack-overflow: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "evaluate_term must not stack-overflow: {:?}",
+        result.err()
+    );
 }
 
 /// Indirect cycle: yoneda_ff_forward calls compose_C with swapped arguments
@@ -66,7 +70,11 @@ swap (a : C) (b : C) (f : a ->[C] b) : end (x : C). ((x ->[C] a) -> (x ->[C] b))
 "#;
     let (_syntax, semantics, typed) = compile_with_engines(source);
     let result = semantics.evaluate_term(&typed, &Expr::var("swap"));
-    assert!(result.is_ok(), "evaluate_term must not stack-overflow: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "evaluate_term must not stack-overflow: {:?}",
+        result.err()
+    );
 }
 
 /// Transitive chain: subst has {a→Var("x"), b→Var("a"), c→Var("b")}.
@@ -92,7 +100,11 @@ precomp (a : C) (b : C) (f : a ->[C] b) (alpha : end (x : C). ((a ->[C] x) -> (x
 "#;
     let (_syntax, semantics, typed) = compile_with_engines(source);
     let result = semantics.evaluate_term(&typed, &Expr::var("precomp"));
-    assert!(result.is_ok(), "evaluate_term must not stack-overflow: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "evaluate_term must not stack-overflow: {:?}",
+        result.err()
+    );
     let output = result.unwrap();
     // The normalized form should reference parameters a, b, f, alpha —
     // not collapse them via transitive substitution.
@@ -106,8 +118,8 @@ precomp (a : C) (b : C) (f : a ->[C] b) (alpha : end (x : C). ((a ->[C] x) -> (x
 /// Stdlib smoke test: compose_assoc from Morphism.ditt evaluates without overflow.
 #[test]
 fn stdlib_morphism_compose_assoc_evaluates() {
-    let source = std::fs::read_to_string("stdlib/Morphism.ditt")
-        .expect("stdlib/Morphism.ditt must exist");
+    let source =
+        std::fs::read_to_string("stdlib/Morphism.ditt").expect("stdlib/Morphism.ditt must exist");
     let (_syntax, semantics, typed) = compile_with_engines(&source);
     let result = semantics.evaluate_term(&typed, &Expr::var("compose_assoc"));
     assert!(

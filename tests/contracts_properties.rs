@@ -7,8 +7,22 @@ use proptest::prelude::*;
 
 /// Language keywords that cannot appear as variable names in expression position.
 const KEYWORDS: &[&str] = &[
-    "module", "where", "import", "postulate", "let", "in", "Top", "refl", "J", "end", "coend",
-    "as", "using", "hiding", "renaming", "to",
+    "module",
+    "where",
+    "import",
+    "postulate",
+    "let",
+    "in",
+    "Top",
+    "refl",
+    "J",
+    "end",
+    "coend",
+    "as",
+    "using",
+    "hiding",
+    "renaming",
+    "to",
 ];
 
 fn ident() -> impl Strategy<Value = String> {
