@@ -3239,10 +3239,13 @@ fn normalize_var_expr(
     allow_implicit_fallback: bool,
 ) -> Expr {
     if let Some(value) = subst.get(name) {
-        if matches!(value, Expr::Var(inner) if inner == name) {
-            return Expr::var(name);
-        }
-        return normalize_expr(module, value, subst, seen);
+        // Values in the substitution are already normalized (by the Lambda,
+        // Let, or beta_apply site that inserted them). Returning them
+        // directly is correct and avoids re-normalizing through the same
+        // substitution, which causes infinite loops when beta-reduction
+        // maps a parameter name to an expression containing that name
+        // (variable capture).
+        return value.clone();
     }
     if seen.contains(name) {
         return Expr::var(name);

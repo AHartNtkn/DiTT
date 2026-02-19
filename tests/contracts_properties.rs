@@ -5,10 +5,18 @@ use ditt_lang::api::*;
 use ditt_lang::runtime::{SemanticEngine, SyntaxEngine};
 use proptest::prelude::*;
 
-prop_compose! {
-    fn ident()(head in "\\p{XID_Start}", tail in "\\p{XID_Continue}{0,120}") -> String {
-        format!("{head}{tail}")
-    }
+/// Language keywords that cannot appear as variable names in expression position.
+const KEYWORDS: &[&str] = &[
+    "module", "where", "import", "postulate", "let", "in", "Top", "refl", "J", "end", "coend",
+    "as", "using", "hiding", "renaming", "to",
+];
+
+fn ident() -> impl Strategy<Value = String> {
+    ("\\p{XID_Start}", "\\p{XID_Continue}{0,120}")
+        .prop_map(|(head, tail)| format!("{head}{tail}"))
+        .prop_filter("must not be a language keyword", |id| {
+            !KEYWORDS.contains(&id.as_str())
+        })
 }
 
 prop_compose! {

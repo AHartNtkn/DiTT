@@ -70,7 +70,7 @@ All limitations classified as **(P)** for paper-inherent.
 
 - **L10: Term/predicate separation (P)** --- Figures 8-9, Section 1.1 item 2. Terms are functors (object-level); predicates/entailments are (di)natural transformations (proposition-level). This means constructions that need to "return an object" (like the classical codensity monad of a functor, or initial algebras) are not expressible --- only predicate-level analogs work.
 
-- **L11: No higher categories (P)** --- Section 1.1 item 1, Section 7. The theory is 1-categorical. Higher categories mentioned as future work.
+- **L11: No higher categories (P)** --- Section 1.1 item 1, Section 7. The theory is 1-categorical. The paper mentions higher categories as a potential extension.
 
 - **L12: No internal category construction (P)** --- Figure 7. Categories are introduced by signature, not constructed internally.
 
