@@ -1,95 +1,136 @@
 # DiTT
 
-DiTT is a contract-first implementation of the first-order directed type theory from:
+DiTT is an implementation of the first-order directed type theory from:
 
 - Andrea Laretto, Fosco Loregian, Niccolo Veltri, *Di- is for Directed: First-Order Directed Type Theory via Dinaturality* (POPL 2026)
 - PDF in this repo: `References/2409.10237v2.pdf`
 
+In DiTT, types are categories, equality proofs are directed morphisms, and (co)ends serve as quantifiers. Unlike Homotopy Type Theory, where paths are invertible, DiTT's morphisms are one-way --- capturing the mathematical reality of categories.
+
 ## Current Status
 
-This repository is in **red-phase TDD**.
+The type checker, parser, normalizer, and evaluator are implemented. The standard library contains 15 modules of verified category theory constructions. All contract tests pass.
 
-- The runtime subsystem APIs in `src/runtime/{syntax,semantics,tooling}.rs` are intentionally `Unimplemented("...")`.
-- The expected failing mode is enforced by `scripts/check_red_phase.sh`.
-- The product surface is specified by tests and fixtures under `tests/`.
+## Surface Syntax
 
-So today, this repo defines the intended language/contracts; it does not yet provide a working implementation.
+DiTT uses an Agda-like syntax with built-ins for directed constructs. Unicode is the default; ASCII is accepted as a fallback.
 
-## What Is Specified Today
+| Concept | Unicode (default) | ASCII fallback |
+|---|---|---|
+| Lambda | `λx. body` | `\x. body` |
+| Arrow / implication | `A → B` | `A -> B` |
+| Directed hom | `a →[C] b` | `a ->[C] b` |
+| End (universal) | `∫ (x : C). P x` | `end (x : C). P x` |
+| Coend (existential) | `∫^ (x : C). P x` | `coend (x : C). P x` |
+| Product | `A × B` | `A * B` |
+| Opposite category | `C^` | `C^` |
+| Identity morphism | `refl x` | `refl x` |
+| J eliminator | `J h [f]` | `J h [f]` |
 
-## 1. Surface language contract
+## Standard Library
 
-Concrete syntax and coverage are specified in:
+15 modules in `stdlib/`, each self-contained with its own postulates:
 
-- `docs/SURFACE_SYNTAX_CONTRACT.md`
-- `docs/SURFACE_SYNTAX_COVERAGE.csv`
-- `tests/conformance/syntax/*`
+| Module | Contents |
+|---|---|
+| `Category` | Identity morphism |
+| `Morphism` | Composition, identity laws, associativity, opposite hom isomorphism |
+| `Functor` | Functorial action on morphisms, identity and composition laws |
+| `NatTrans` | Natural transformations, vertical/horizontal composition, whiskering, dinaturals |
+| `Yoneda` | Transport, Yoneda forward/backward, round-trips, embedding, full faithfulness |
+| `EndCoend` | Fubini, product/implication preservation, currying, singleton, end-to-coend |
+| `KanExtension` | Right/left Kan extensions, unit/counit maps |
+| `Adjunction` | Hom-isomorphism, unit/counit, triangle identity composites |
+| `Profunctor` | Hom profunctor, composition, representable profunctors, right lifts |
+| `Presheaf` | Presheaf exponential, evaluation, currying, Day convolution |
+| `Codensity` | Codensity monad (Ran_Id P), unit/counit/join |
+| `ChurchEncoding` | Booleans, naturals, lists, maybe, cross-type operations |
+| `Limit` | Limit cones, colimit cocones, universal properties, weighted (co)limits |
+| `Monad` | Monad/comonad structure types, algebras, monad from adjunction |
+| `Enriched` | V-enriched category structure, V-functors, V-natural transformations |
 
-Including proof-term forms:
+## Documentation
 
-- `refl t`
-- `J h [e]`
-- `end alpha`, `end^-1 beta`
-- `coend alpha`, `coend^-1 beta`
-- quantifier forms `end (x : C). P` / `coend (x : C). P` (and unicode variants)
+- `docs/TUTORIAL.md` --- 22-section progressive tutorial covering all stdlib modules
+- `docs/THEORY_CAPABILITIES.md` --- what the theory can and cannot express, with workarounds
+- `docs/SURFACE_SYNTAX_CONTRACT.md` --- formal surface syntax specification
+- `docs/PAPER_PARITY.md` --- paper-to-implementation traceability
 
-Judgmental equality model (user-facing contract):
+## Architecture
 
-- DiTT does not expose a propositional equality type for users to inhabit.
-- `=` in source code is a definition separator (`name : A = term`), not an equality proposition.
-- Paper equations (for example, cut coherence and end adjoint isomorphism equations) are enforced as judgmental convertibility: a term inferred at form `B` must be accepted when a context asks for form `A` exactly when the checker establishes `A` and `B` as judgmentally equal.
+```
+src/
+├── main.rs                 # Binary entry point (ditt CLI)
+├── lib.rs                  # Crate root
+├── api/
+│   ├── foundation.rs       # All domain types (Expr, CatType, ProofTerm, etc.)
+│   ├── syntax.rs           # Traits: Lexer, Parser, Formatter
+│   ├── semantics.rs        # Traits: TypeChecker, Normalizer, Evaluator
+│   ├── tooling.rs          # Traits: ModuleSystem, Cli, Repl, LSP
+│   └── interaction.rs      # CLI/REPL/LSP data types
+└── runtime/
+    ├── syntax.rs           # SyntaxEngine: parsing, formatting
+    ├── semantics.rs        # SemanticEngine: type checking, normalization
+    └── tooling.rs          # ToolingEngine: module system, CLI, REPL, LSP
+```
 
-Paper-to-surface notation mapping used in this repo:
+## Using DiTT
 
-- Paper function/functor constructor `[C, D]` is written in surface form as `C -> D` (unicode: `C → D`).
-- Paper hom `hom_C(a, b)` is written as `a ->[C] b` (unicode: `a →[C] b`).
-- Paper ends/coends `∫` / `∫^` are accepted as unicode and as ASCII `end` / `coend`.
+### CLI
 
-## 2. Paper examples corpus
+```bash
+ditt check stdlib/Yoneda.ditt                        # Type-check a file
+ditt build stdlib/Morphism.ditt                       # Build (type-check) a file
+ditt fmt stdlib/Functor.ditt                          # Format a file
+ditt run --entry yoneda_forward stdlib/Yoneda.ditt    # Evaluate a definition
+ditt run --normalize compose stdlib/Morphism.ditt     # Normalize a definition
+ditt help                                             # All commands and options
+```
 
-Paper examples are tracked as dedicated fixtures/contracts:
+Source can also be piped via stdin: `cat stdlib/Yoneda.ditt | ditt check`
 
-- registry: `tests/conformance/semantics/paper_examples.csv`
-- appendix registry: `tests/conformance/semantics/paper_appendix_examples.csv`
-- fixtures: `tests/conformance/semantics/examples/ex*.spec`
-- dedicated contracts: `tests/contracts_paper_examples_dedicated.rs`
-- appendix contracts: `tests/contracts_paper_appendix_examples.rs`
-- structural/API fidelity checks: `tests/contracts_paper_examples_api.rs`
+Build with `cargo build --release`; the binary is `target/release/ditt`.
 
-Covered examples include 2.4, 2.10, 3.1-3.11, 6.1-6.5, variance examples 2.6/2.7/2.11, and appendix examples B.1-B.5, C.1-C.3, D.1-D.3.
+### REPL
 
-## 3. Rule and provenance tracking
+```
+$ ditt repl
+DiTT 0.1.0 — :load <file>, :help, :quit
+> :load stdlib/Yoneda.ditt
+Loaded stdlib/Yoneda.ditt
+> yo
+λa. λx. (x →[C] a)
+> transport_P
+λa. λb. λf. J (λz. λp. p) [f]
+> :quit
+```
 
-Paper rule/example provenance and registry constraints are tracked in:
+The REPL supports `:load <file>` to load a stdlib module (or any `.ditt` file), then any definition name can be evaluated as an expression.
 
-- `docs/PAPER_RULE_COVERAGE.csv`
-- `docs/PAPER_PROVENANCE.csv`
-- `tests/contracts_paper_rule_coverage.rs`
-- `tests/contracts_paper_provenance.rs`
+### Library
 
-Rule coverage includes:
+DiTT is also available as a Rust library (`ditt_lang`). The test suite exercises all stdlib modules:
 
-- Figure 10 variance-side-condition contracts (`f10_cov_*`, `f10_contra`, `f10_unused`)
-- Figure 13 unused-variable rule contracts (`f13_*`)
-- Figure 14 full variance-side-condition family contracts (`f14_*`)
-- Figure 15 cut equational-family contracts (`f15_*`)
-- Figure 16/17 end adjoint-form + functoriality contracts (`f16_*`, `f17_*`)
-- Figure 11 entailment/equality contracts (`var` through `j_eq`)
+```bash
+cargo test --test contracts_stdlib_library
+```
 
-## Running The Contract Suite
+## Building and Testing
 
-Common commands:
+Rust edition 2024. One dependency (`unicode-ident`).
 
-- Red-phase provenance gate:
-  - `bash scripts/check_red_phase.sh`
-- Full test suite:
-  - `cargo test --no-fail-fast`
+```bash
+cargo check --tests          # Type-check everything
+cargo test --no-fail-fast    # Full test suite
+cargo test --test <file>     # Run a specific test file
+cargo clippy --tests         # Lint (must be zero warnings)
+cargo fmt                    # Format
+```
 
-In red phase, failures are expected; they must be attributable to `Unimplemented("...")` boundaries.
+## Design Principles
 
-## Important Scope Boundaries
-
-- `tests/` and `docs/` define the language/API contract.
-- `src/` defines implementation architecture; currently stubbed.
-- No effects are part of the core language contracts.
-- Core theory is locked to the paper (directed equality, dinaturality, (co)ends-as-quantifiers).
+- **The paper is the specification.** Every API surface traces to a paper rule, judgment form, or syntactic clause.
+- **Directed, not symmetric.** Morphisms go one way. This is the core feature, not a limitation.
+- **First-order.** Categories and predicates are fixed by the signature. No quantification over predicates or categories.
+- **Judgment-oriented.** Equational reasoning is judgmental (handled by the normalizer), not propositional.
+- **No effects in core language.**

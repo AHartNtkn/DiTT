@@ -3,6 +3,10 @@ name = "ditt_lang"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "ditt"
+path = "src/main.rs"
+
 [dependencies]
 unicode-ident = "1.0"
 
