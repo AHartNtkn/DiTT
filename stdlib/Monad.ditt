@@ -1,0 +1,60 @@
+module Std.Monad where
+
+postulate
+  C : Cat
+  T : (x : C) → C
+
+// Monad unit type: eta : Id => T (a natural transformation from identity to T).
+monad_unit_type : Prop = ∫ (x : C). (x →[C] T x)
+
+// Monad multiplication type: mu : T.T => T (a natural transformation from T^2 to T).
+monad_mult_type : Prop = ∫ (x : C). (T (T x) →[C] T x)
+
+// Functorial action of T on morphisms.
+diag_map_T (z : C) : T z →[C] T z = refl (T z)
+
+map_T (a : C^) (b : C) (f : a →[C] b) : T a →[C] T b =
+  J diag_map_T [f]
+
+// T-algebra type: an algebra at object a is a morphism T a →[C] a.
+algebra (a : C) : Prop = T a →[C] a
+
+// Free algebra: given monad multiplication mu, the free algebra on a
+// is mu_a : T(T a) →[C] T a.
+free_algebra (mu : monad_mult_type) (a : C) : T (T a) →[C] T a = mu a
+
+// Comonad structure types.
+postulate
+  W : (x : C) → C
+
+// Comonad counit type: epsilon : W => Id.
+comonad_counit_type : Prop = ∫ (x : C). (W x →[C] x)
+
+// Comonad comultiplication type: delta : W => W.W.
+comonad_comult_type : Prop = ∫ (x : C). (W x →[C] W (W x))
+
+// Functorial action of W on morphisms.
+diag_map_W (z : C) : W z →[C] W z = refl (W z)
+
+map_W (a : C^) (b : C) (f : a →[C] b) : W a →[C] W b =
+  J diag_map_W [f]
+
+// W-coalgebra type: a coalgebra at object a is a morphism a →[C] W a.
+coalgebra (a : C) : Prop = a →[C] W a
+
+// Monad induced by an adjunction F -| G.
+// The endofunctor is T = G.F. The multiplication is G(epsilon_{Fx}).
+postulate
+  D : Cat
+  F : (x : C) → D
+  G : (y : D) → C
+  epsilon : ∫ (b : D). (F (G b) →[D] b)
+
+diag_map_G (z : D) : G z →[C] G z = refl (G z)
+
+map_G (a : D^) (b : D) (f : a →[D] b) : G a →[C] G b =
+  J diag_map_G [f]
+
+// Monad multiplication from adjunction: mu_x = G(epsilon_{Fx})
+adjunction_mult : ∫ (x : C). (G (F (G (F x))) →[C] G (F x)) =
+  λx. map_G (F (G (F x))) (F x) (epsilon (F x))

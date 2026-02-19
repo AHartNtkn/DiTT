@@ -1,0 +1,90 @@
+module Std.ChurchEncoding where
+
+postulate
+  C : Cat
+  P : (x : C) → Prop
+
+// Church booleans for a fixed predicate P over category C.
+// BoolCP selects between two values of P x uniformly across x.
+BoolCP : Prop = ∫ (x : C). (P x → P x → P x)
+
+trueCP : BoolCP = λx. λa. λb. a
+
+falseCP : BoolCP = λx. λa. λb. b
+
+ifCP (b : BoolCP) (x : C) (then_val : P x) (else_val : P x) : P x =
+  b x then_val else_val
+
+andCP (a : BoolCP) (b : BoolCP) : BoolCP =
+  λx. λp. λq. ifCP a x (ifCP b x p q) q
+
+orCP (a : BoolCP) (b : BoolCP) : BoolCP =
+  λx. λp. λq. ifCP a x p (ifCP b x p q)
+
+notCP (b : BoolCP) : BoolCP =
+  λx. λp. λq. ifCP b x q p
+
+// Church naturals for a fixed predicate P over category C.
+// NatCP folds a zero value and a successor function uniformly across x.
+NatCP : Prop = ∫ (x : C). (P x → (P x → P x) → P x)
+
+zero : NatCP = λx. λz. λs. z
+
+succ (n : NatCP) : NatCP = λx. λz. λs. s (n x z s)
+
+one : NatCP = succ zero
+
+two : NatCP = succ one
+
+three : NatCP = succ two
+
+add (m : NatCP) (n : NatCP) : NatCP =
+  λx. λz. λs. m x (n x z s) s
+
+mult (m : NatCP) (n : NatCP) : NatCP =
+  λx. λz. λs. m x z (λacc. n x acc s)
+
+// Iterate a function n times (the fold/catamorphism for NatCP).
+iterate (n : NatCP) (x : C) (start : P x) (step : P x → P x) : P x =
+  n x start step
+
+// Cross-type operation: isZero works because BoolCP and NatCP share C and P.
+isZero (n : NatCP) : BoolCP =
+  λx. λt. λf. n x t (λp. f)
+
+// Cross-type conversion: boolean to natural (true → 1, false → 0).
+boolToNat (b : BoolCP) : NatCP =
+  λx. λz. λs. b x (s z) z
+
+// Conditional on naturals: select between two naturals based on a boolean.
+ifNat (cond : BoolCP) (then_n : NatCP) (else_n : NatCP) : NatCP =
+  λx. λz. λs. cond x (then_n x z s) (else_n x z s)
+
+// Church-encoded lists for a fixed element type A over category C.
+// ListAP folds a nil value and a cons function uniformly across x.
+postulate
+  A : (x : C) → Prop
+
+ListAP : Prop = ∫ (x : C). (P x → (A x → P x → P x) → P x)
+
+nil : ListAP = λx. λz. λf. z
+
+cons (head : ∫ (x : C). A x) (tail : ListAP) : ListAP =
+  λx. λz. λf. f (head x) (tail x z f)
+
+foldr (list : ListAP) (x : C) (z : P x) (f : A x → P x → P x) : P x =
+  list x z f
+
+append (xs : ListAP) (ys : ListAP) : ListAP =
+  λx. λz. λf. xs x (ys x z f) f
+
+// Church-encoded option/maybe type for a fixed element type A.
+MaybeAP : Prop = ∫ (x : C). (P x → (A x → P x) → P x)
+
+nothingAP : MaybeAP = λx. λz. λf. z
+
+justAP (a : ∫ (x : C). A x) : MaybeAP =
+  λx. λz. λf. f (a x)
+
+maybeAP (m : MaybeAP) (x : C) (default_val : P x) (f : A x → P x) : P x =
+  m x default_val f

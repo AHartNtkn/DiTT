@@ -1,0 +1,40 @@
+module Std.Enriched where
+
+// V-enriched category: a category with hom-objects valued in a monoidal category V.
+// DiTT can express this because enriched homs are V-objects
+// and composition/identity are V-morphisms.
+
+postulate
+  V : Cat
+  tensor : (x : V) → (y : V) → V
+  I_V : V
+  C : Cat
+
+// Enriched hom: for each pair of C-objects, an object of V.
+postulate
+  hom_V : (a : C) → (b : C) → V
+
+// Enriched composition: tensor(hom(b,c), hom(a,b)) →[V] hom(a,c)
+postulate
+  comp_V : (a : C) → (b : C) → (c : C) → (tensor (hom_V b c) (hom_V a b)) →[V] (hom_V a c)
+
+// Enriched identity: I_V →[V] hom(a, a)
+postulate
+  id_V : (a : C) → I_V →[V] (hom_V a a)
+
+// V-functor: a functor between V-enriched categories.
+// The action on hom-objects: hom_C(a, b) →[V] hom_D(F_obj a, F_obj b).
+postulate
+  D : Cat
+  hom_V_D : (a : D) → (b : D) → V
+  F_obj : (x : C) → D
+
+v_functor_action : Prop =
+  ∫ (a : C). ∫ (b : C). (hom_V a b →[V] hom_V_D (F_obj a) (F_obj b))
+
+// V-natural transformation: a family of V-morphisms I_V →[V] hom_D(F a, G a).
+postulate
+  G_obj : (x : C) → D
+
+v_nat_trans : Prop =
+  ∫ (a : C). (I_V →[V] hom_V_D (F_obj a) (G_obj a))

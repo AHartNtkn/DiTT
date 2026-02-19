@@ -1,0 +1,78 @@
+module Std.NatTrans where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) → D
+  G : (x : C) → D
+  H : (x : C) → D
+
+// The type of natural transformations from F to G,
+// characterized as an ∫ (Paper Example 3.5, Appendix B.4, Theorem D.4).
+nat_trans : Prop =
+  ∫ (x : C). (F x →[D] G x)
+
+// Identity natural transformation: at each x, refl (F x) : F x →[D] F x.
+nat_id : ∫ (x : C). (F x →[D] F x) =
+  λx. refl (F x)
+
+// Composition of natural transformations (Appendix B.4).
+// Given eta : Nat(F, G) and eps : Nat(G, H), produce Nat(F, H)
+// by pointwise composition of morphisms in D.
+diag_comp_D (c : D) (z : D) : (z →[D] c) → (z →[D] c) =
+  λk. k
+
+compose_D (a : D^) (b : D) (c : D) (f : a →[D] b) (g : b →[D] c) : a →[D] c =
+  (J (diag_comp_D c) [f]) g
+
+nat_comp (eta : ∫ (x : C). (F x →[D] G x)) (eps : ∫ (x : C). (G x →[D] H x)) : ∫ (x : C). (F x →[D] H x) =
+  λx. compose_D (F x) (G x) (H x) (eta x) (eps x)
+
+// Whiskering: precomposition of a natural transformation with a functor.
+// Given K : E → C and eta : Nat(F, G), produce Nat(F . K, G . K).
+postulate
+  E : Cat
+  K : (e : E) → C
+
+whisker_left (eta : ∫ (x : C). (F x →[D] G x)) : ∫ (e : E). (F (K e) →[D] G (K e)) =
+  λe. eta (K e)
+
+// Whiskering: postcomposition of a natural transformation with a functor.
+// Given L : D → E2 and eta : Nat(F, G), produce Nat(L . F, L . G).
+postulate
+  E2 : Cat
+  L : (d : D) → E2
+
+map_L (a : D^) (b : D) (f : a →[D] b) : L a →[E2] L b =
+  J (λz. refl (L z)) [f]
+
+whisker_right (eta : ∫ (x : C). (F x →[D] G x)) : ∫ (x : C). (L (F x) →[E2] L (G x)) =
+  λx. map_L (F x) (G x) (eta x)
+
+// Polymorphic identity: the canonical element of ∫ (x : C). (x →[C] x).
+// The identity natural transformation on the identity functor.
+poly_id : ∫ (x : C). (x →[C] x) = λx. refl x
+
+// Horizontal composition (Godement product):
+// Given alpha : Nat(F, G) and beta : Nat(L, M) where M : D → E2,
+// produce ∫ (x : C). (L(F x) →[E2] M(G x)).
+// Pointwise: beta_{G x} . L(alpha_x)
+postulate
+  M : (d : D) → E2
+
+diag_comp_E2 (c : E2) (z : E2) : (z →[E2] c) → (z →[E2] c) = λk. k
+
+compose_E2 (a : E2^) (b : E2) (c : E2) (f : a →[E2] b) (g : b →[E2] c) : a →[E2] c =
+  (J (diag_comp_E2 c) [f]) g
+
+horizontal_comp (alpha : ∫ (x : C). (F x →[D] G x)) (beta : ∫ (y : D). (L y →[E2] M y)) : ∫ (x : C). (L (F x) →[E2] M (G x)) =
+  λx. compose_E2 (L (F x)) (L (G x)) (M (G x)) (map_L (F x) (G x) (alpha x)) (beta (G x))
+
+// Dinatural transformation type (Paper Theorem D.4):
+// Dinat(PD, QD) = ∫ (x : C). (PD x x → QD x x)
+// for PD, QD : C^op x C → Prop.
+postulate
+  PD : (x : C) → (y : C) → Prop
+  QD : (x : C) → (y : C) → Prop
+
+dinat : Prop = ∫ (x : C). (PD x x → QD x x)

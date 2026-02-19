@@ -1,0 +1,43 @@
+module Std.Profunctor where
+
+postulate
+  B : Cat
+  C : Cat
+  D : Cat
+  // Profunctor P : B --/-→ C, i.e., a dipresheaf P(b, c) on B x C.
+  P : (b : B) → (c : C) → Prop
+  // Profunctor Q : C --/-→ D, i.e., a dipresheaf Q(c, d) on C x D.
+  Q : (c : C) → (d : D) → Prop
+
+// The hom profunctor: Hom_C(a, b) = a →[C] b.
+hom_profunctor (a : C) (b : C) : Prop =
+  a →[C] b
+
+// Profunctor composition via coends (Paper Definition D.3):
+// (Q . P)(b, d) = ∫^ (c : C). P(b, c) × Q(c, d)
+prof_compose (b : B) (d : D) : Prop =
+  ∫^ (c : C). (P b c × Q c d)
+
+// The hom profunctor is the identity for profunctor composition.
+// Witness: given a pair (refl c, p) at the diagonal.
+prof_id_witness (c : C) (c2 : C) (p : c →[C] c2) : ∫^ (z : C). ((c →[C] z) × (z →[C] c2)) =
+  ∫^ (λz. (refl c, p))
+
+// Representable profunctor induced by a functor F : B → C.
+// RepF(b, c) = hom_C(F b, c)
+postulate
+  F : (x : B) → C
+
+repr_profunctor (b : B) (c : C) : Prop = F b →[C] c
+
+// Right lift in Prof (Paper Example D.2):
+// (Rift_P Q)(b, d) = ∫ (c : C). (P(b, c) → Q(c, d))
+// Universal property: R . P |- Q iff R |- Rift_P(Q)
+rift (b : B) (d : D) : Prop = ∫ (c : C). (P b c → Q c d)
+
+// Natural transformation between profunctors P and P2 : B --/-→ C.
+// Nat(P, P2) = ∫ (b : B). ∫ (c : C). (P(b, c) → P2(b, c))
+postulate
+  P2 : (b : B) → (c : C) → Prop
+
+nat_prof : Prop = ∫ (b : B). ∫ (c : C). (P b c → P2 b c)

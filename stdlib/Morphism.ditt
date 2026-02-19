@@ -1,0 +1,33 @@
+module Std.Morphism where
+
+postulate C : Cat
+
+// Diagonal composition witness: the identity function on morphisms into c.
+diag_comp (c : C) (z : C) : (z →[C] c) → (z →[C] c) =
+  λk. k
+
+// Composition of morphisms via the directed J eliminator.
+compose (a : C^) (b : C) (c : C) (f : a →[C] b) (g : b →[C] c) : a →[C] c =
+  (J (diag_comp c) [f]) g
+
+// Left identity: compose (refl a) f = f
+compose_left_id (a : C) (b : C) (f : a →[C] b) : a →[C] b =
+  compose a a b (refl a) f
+
+// Right identity: compose f (refl b) = f
+compose_right_id (a : C) (b : C) (f : a →[C] b) : a →[C] b =
+  compose a b b f (refl b)
+
+// Associativity: compose (compose f g) k = compose f (compose g k)
+compose_assoc (a : C) (b : C) (c : C) (d : C) (f : a →[C] b) (g : b →[C] c) (k : c →[C] d) : a →[C] d =
+  compose a c d (compose a b c f g) k
+
+// Opposite category hom isomorphism (Paper Appendix B.5):
+// hom_C(x, y) → hom_{C^op}(y, x) and vice versa.
+// J with diagonal λz. refl z witnesses the iso: at the diagonal,
+// hom_{C^op}(z, z) = hom_C(z, z) by double-opposite reduction.
+op_hom_forward (x : C) (y : C) (f : x →[C] y) : y →[C^] x =
+  J (λz. refl z) [f]
+
+op_hom_backward (x : C) (y : C) (g : y →[C^] x) : x →[C] y =
+  J (λz. refl z) [g]

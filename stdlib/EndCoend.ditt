@@ -1,0 +1,70 @@
+module Std.EndCoend where
+
+postulate
+  C : Cat
+  D : Cat
+  P : (x : C) → Prop
+  Q : (x : C) → Prop
+  R : (x : C) → (y : C) → Prop
+
+// Canonical map from ∫ to ∫^: a universal witness provides
+// an existential witness. Given alpha : ∫ (x : C). R x x,
+// alpha x : R x x for each x, and ∫^ packages this family.
+end_to_coend (alpha : ∫ (x : C). R x x) : ∫^ (x : C). R x x =
+  ∫^ (λx. alpha x)
+
+// End preserves products (left direction):
+// ∫ (x : C). (P x × Q x) → (∫ (x : C). P x) × (∫ (x : C). Q x)
+end_preserves_prod_left (alpha : ∫ (x : C). (P x × Q x)) : (∫ (x : C). P x) × (∫ (x : C). Q x) =
+  (λx. (alpha x).1, λx. (alpha x).2)
+
+// End preserves products (right direction):
+// (∫ (x : C). P x) × (∫ (x : C). Q x) → ∫ (x : C). (P x × Q x)
+end_preserves_prod_right (pair : (∫ (x : C). P x) × (∫ (x : C). Q x)) : ∫ (x : C). (P x × Q x) =
+  λx. (pair.1 x, pair.2 x)
+
+// Fubini for ends (Paper Example 6.4):
+// ∫ (x : C). ∫ (y : D). S x y → ∫ (y : D). ∫ (x : C). S x y
+postulate
+  S : (x : C) → (y : D) → Prop
+
+fubini_left (alpha : ∫ (x : C). ∫ (y : D). S x y) : ∫ (y : D). ∫ (x : C). S x y =
+  λy. λx. alpha x y
+
+// Fubini for ends (reverse direction):
+// ∫ (y : D). ∫ (x : C). S x y → ∫ (x : C). ∫ (y : D). S x y
+fubini_right (beta : ∫ (y : D). ∫ (x : C). S x y) : ∫ (x : C). ∫ (y : D). S x y =
+  λx. λy. beta y x
+
+// Restricted cut (∫ elimination at a specific object):
+// Given all : ∫ (x : C). P x and a : C, extract P a.
+restricted_cut (a : C) (all : ∫ (x : C). P x) : P a =
+  all a
+
+// Singleton existence (Paper Example 3.6):
+// ∫ (x : C). ∫^ (y : C). (x →[C] y) is inhabited.
+// For each x, witness the ∫^ with y = x and refl x.
+singleton : ∫ (x : C). ∫^ (y : C). (x →[C] y) =
+  λx. ∫^ (λy. refl x)
+
+// Currying for ends:
+// ∫ (x). ((P x × Q x) → T x) <→ ∫ (x). (P x → Q x → T x)
+postulate
+  T : (x : C) → Prop
+
+curry_end (f : ∫ (x : C). ((P x × Q x) → T x)) : ∫ (x : C). (P x → Q x → T x) =
+  λx. λpx. λqx. f x (px, qx)
+
+uncurry_end (g : ∫ (x : C). (P x → Q x → T x)) : ∫ (x : C). ((P x × Q x) → T x) =
+  λx. λpair. g x pair.1 pair.2
+
+// End preserves implication (Paper Example 6.5):
+// (K → ∫ (x). P x) <→ ∫ (x). (K → P x) when K is constant.
+postulate
+  K : Prop
+
+end_preserves_impl_fwd (f : K → ∫ (x : C). P x) : ∫ (x : C). (K → P x) =
+  λx. λk. f k x
+
+end_preserves_impl_bwd (g : ∫ (x : C). (K → P x)) : K → ∫ (x : C). P x =
+  λk. λx. g x k

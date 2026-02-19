@@ -1,0 +1,42 @@
+module Std.Presheaf where
+
+postulate
+  C : Cat
+  A : (x : C) → Prop
+  B : (x : C) → Prop
+
+// Presheaf exponential (internal hom in the presheaf category).
+// (A => B)(x) = ∫ (y : C). ((x →[C] y) × A y → B y)
+// Paper Example 6.2: this is the pointwise formula for the exponential
+// object in the category of copresheaves on C.
+presheaf_exp (x : C) : Prop =
+  ∫ (y : C). (((x →[C] y) × A y) → B y)
+
+// Evaluation map: (A => B)(x) × A(x) → B(x)
+// Given phi : presheaf_exp x and ax : A x, instantiate the ∫ at y = x
+// with (refl x, ax) to get B x.
+presheaf_eval (x : C) (phi : presheaf_exp x) (ax : A x) : B x =
+  phi x (refl x, ax)
+
+// Currying map for presheaf exponential:
+// Given a morphism ∫ (x). (A x × Z x → B x), produce ∫ (x). (Z x → presheaf_exp x).
+// This is the transpose of the CCC adjunction A x (-) -| (A => -).
+postulate
+  Z : (x : C) → Prop
+
+presheaf_curry (h : ∫ (x : C). ((A x × Z x) → B x)) (x : C) (zx : Z x) : presheaf_exp x =
+  λy. λpair. h y ((J (λw. λaw. aw) [pair.1]) (pair.2), (J (λw. λzw. zw) [pair.1]) zx)
+
+// Day convolution type (for copresheaves on a monoidal category).
+// (A × B)(c) = ∫^ (a : C). ∫^ (b : C). (tensor a b →[C] c) × A a × B b
+postulate
+  tensor : (x : C) → (y : C) → C
+
+day_conv (c : C) : Prop =
+  ∫^ (a : C). ∫^ (b : C). ((tensor a b →[C] c) × A a × B b)
+
+// Day convolution unit: the presheaf represented by the monoidal unit.
+postulate
+  I_C : C
+
+day_unit (c : C) : Prop = I_C →[C] c

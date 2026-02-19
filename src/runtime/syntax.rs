@@ -237,12 +237,7 @@ impl ExprParser {
         while self.starts_argument() {
             if self.eat_symbol("{") {
                 let arg = if self.check_identifier() {
-                    if self
-                        .tokens
-                        .get(self.pos + 1)
-                        .map(|t| t.text.as_str())
-                        != Some("=")
-                    {
+                    if self.tokens.get(self.pos + 1).map(|t| t.text.as_str()) != Some("=") {
                         return Err(parse_error(
                             "missing_implicit_arg_eq",
                             "implicit named arguments must use '='".to_string(),
@@ -351,11 +346,7 @@ impl ExprParser {
             return Ok(Expr::refl(term));
         }
         if self.check_keyword("J")
-            && self
-                .tokens
-                .get(self.pos + 1)
-                .map(|t| t.text.as_str())
-                != Some(".")
+            && self.tokens.get(self.pos + 1).map(|t| t.text.as_str()) != Some(".")
         {
             self.pos += 1;
             let transport = self.parse_postfix()?;
@@ -412,9 +403,7 @@ impl ExprParser {
     }
 
     fn parse_end_or_coend(&mut self, is_end: bool) -> Result<Expr, LanguageError> {
-        if self.eat_symbol("^")
-            && self.eat_symbol("-")
-            && self.eat_number().as_deref() == Some("1")
+        if self.eat_symbol("^") && self.eat_symbol("-") && self.eat_number().as_deref() == Some("1")
         {
             let head = self.parse_postfix()?;
             if is_end {
@@ -563,7 +552,10 @@ impl ExprParser {
                         ));
                     }
                     self.expect_symbol(")")?;
-                    return Ok(SurfacePattern::pair(SurfacePattern::annotated(left, ty), right));
+                    return Ok(SurfacePattern::pair(
+                        SurfacePattern::annotated(left, ty),
+                        right,
+                    ));
                 }
                 self.expect_symbol(")")?;
                 return Ok(SurfacePattern::annotated(left, ty));
@@ -583,7 +575,10 @@ impl ExprParser {
         ))
     }
 
-    fn parse_binder_group(&mut self, stop: &str) -> Result<(Vec<(String, CatType)>, Span), LanguageError> {
+    fn parse_binder_group(
+        &mut self,
+        stop: &str,
+    ) -> Result<(Vec<(String, CatType)>, Span), LanguageError> {
         let start = self.peek_span();
         let mut names = Vec::<String>::new();
         while !self.check_symbol(stop) && !self.is_eof() {
@@ -632,11 +627,7 @@ impl ExprParser {
         let mut i = self.pos;
         while i < self.tokens.len() {
             let t = self.tokens[i].text.as_str();
-            if depth_paren == 0
-                && depth_brace == 0
-                && depth_bracket == 0
-                && stop.contains(&t)
-            {
+            if depth_paren == 0 && depth_brace == 0 && depth_bracket == 0 && stop.contains(&t) {
                 break;
             }
             if t == "(" {
@@ -891,14 +882,20 @@ impl Parser for SyntaxEngine {
             return Err(parse_error(
                 "effects_syntax_forbidden",
                 "effectful parser syntax is not part of the core surface language".to_string(),
-                Some(Span { start: 0, end: source.len().min(1) }),
+                Some(Span {
+                    start: 0,
+                    end: source.len().min(1),
+                }),
             ));
         }
         if source.contains(" .1") || source.contains(" .2") {
             return Err(parse_error(
                 "Parser",
                 "projection syntax cannot start with '.' after whitespace".to_string(),
-                Some(Span { start: 0, end: source.len().min(1) }),
+                Some(Span {
+                    start: 0,
+                    end: source.len().min(1),
+                }),
             ));
         }
         let normalized = normalize_source(source);
@@ -1053,15 +1050,13 @@ impl Parser for SyntaxEngine {
             imports,
             items,
         };
-        let allow_unsupported_projection = module
-            .name
-            .as_ref()
-            .is_some_and(|n| {
-                let name = n.to_string();
-                name.starts_with("Rules.Figure13.UnusedProj.Negative")
-                    || name.starts_with("Rules.CongruenceForAllConstructorsProj.Negative")
-            });
-        if !allow_unsupported_projection && module_items_contain_unsupported_projection(&module.items)
+        let allow_unsupported_projection = module.name.as_ref().is_some_and(|n| {
+            let name = n.to_string();
+            name.starts_with("Rules.Figure13.UnusedProj.Negative")
+                || name.starts_with("Rules.CongruenceForAllConstructorsProj.Negative")
+        });
+        if !allow_unsupported_projection
+            && module_items_contain_unsupported_projection(&module.items)
         {
             return Err(parse_error(
                 "invalid_projection_index",
@@ -1270,16 +1265,15 @@ fn expr_contains_unsupported_projection(expr: &Expr) -> bool {
             arguments,
         } => {
             expr_contains_unsupported_projection(function)
-                || arguments
-                    .iter()
-                    .any(expr_contains_unsupported_projection)
+                || arguments.iter().any(expr_contains_unsupported_projection)
         }
         Expr::Arrow { parameter, result } => {
             expr_contains_unsupported_projection(parameter)
                 || expr_contains_unsupported_projection(result)
         }
         Expr::Product { left, right } | Expr::Pair { left, right } => {
-            expr_contains_unsupported_projection(left) || expr_contains_unsupported_projection(right)
+            expr_contains_unsupported_projection(left)
+                || expr_contains_unsupported_projection(right)
         }
         Expr::Hom {
             category,
@@ -1479,10 +1473,9 @@ fn desugar_definition_tuple_pattern_lambda(value: Expr, binders: &[TermBinder], 
 
 fn canonicalize_type_annotation_expr(expr: &Expr) -> Expr {
     match expr {
-        Expr::Lambda { binders, body } => Expr::lambda(
-            binders.clone(),
-            canonicalize_type_annotation_expr(body),
-        ),
+        Expr::Lambda { binders, body } => {
+            Expr::lambda(binders.clone(), canonicalize_type_annotation_expr(body))
+        }
         Expr::App {
             function,
             arguments,
@@ -1623,7 +1616,10 @@ fn parse_head_and_binders(head: &str) -> Result<(String, Vec<TermBinder>), Langu
         }
         return Err(parse_error(
             "invalid_head",
-            format!("unexpected token '{}' in definition head", parser.peek_text()),
+            format!(
+                "unexpected token '{}' in definition head",
+                parser.peek_text()
+            ),
             Some(parser.peek_span()),
         ));
     }
@@ -1792,10 +1788,7 @@ fn tokenize_for_parser(source: &str) -> Result<Vec<PToken>, LanguageError> {
                 chars.next();
                 out.push(PToken {
                     text: "->".to_string(),
-                    span: Span {
-                        start,
-                        end: i + 1,
-                    },
+                    span: Span { start, end: i + 1 },
                 });
                 continue;
             }
@@ -1879,7 +1872,11 @@ fn canonical_module(module: &SurfaceModule) -> String {
                     if i > 0 {
                         rendered.push(' ');
                     }
-                    let ty = canon_expr(&Expr::from_term(&Term::Var(binder.ty.to_string())), env, next);
+                    let ty = canon_expr(
+                        &Expr::from_term(&Term::Var(binder.ty.to_string())),
+                        env,
+                        next,
+                    );
                     if binder.explicitness == Explicitness::Implicit {
                         rendered.push_str(&format!("{{{id}:{ty}}}"));
                     } else {
@@ -2079,7 +2076,11 @@ fn canonical_module(module: &SurfaceModule) -> String {
     for item in &module.items {
         canon_item(item, &mut items);
     }
-    format!("imports=[{}]|items=[{}]", imports.join(";"), items.join(";"))
+    format!(
+        "imports=[{}]|items=[{}]",
+        imports.join(";"),
+        items.join(";")
+    )
 }
 
 fn format_items(
@@ -2095,7 +2096,8 @@ fn format_items(
         if let ModuleItem::Declaration(Declaration::Postulate { .. }) = &items[idx] {
             out.push_str(&format!("{pad}postulate\n"));
             while idx < items.len() {
-                let ModuleItem::Declaration(Declaration::Postulate { name, ty }) = &items[idx] else {
+                let ModuleItem::Declaration(Declaration::Postulate { name, ty }) = &items[idx]
+                else {
                     break;
                 };
                 let ty_text = apply_surface_style(&format_expr_raw(ty), unicode_style);
@@ -2143,7 +2145,10 @@ fn format_items(
                 }
                 out.push('\n');
             }
-            ModuleItem::SubModule { name, items: nested } => {
+            ModuleItem::SubModule {
+                name,
+                items: nested,
+            } => {
                 out.push_str(&format!("{pad}module {name} where\n\n"));
                 format_items(
                     nested,
@@ -2269,7 +2274,11 @@ fn format_expr_raw(expr: &Expr) -> String {
             format!("({} * {})", format_expr_raw(left), format_expr_raw(right))
         }
         Expr::Arrow { parameter, result } => {
-            format!("({} -> {})", format_expr_raw(parameter), format_expr_raw(result))
+            format!(
+                "({} -> {})",
+                format_expr_raw(parameter),
+                format_expr_raw(result)
+            )
         }
         Expr::End { binder, body } => format!(
             "(end ({} : {}) . {})",
@@ -2377,11 +2386,19 @@ fn format_pattern_raw(pattern: &SurfacePattern) -> String {
     match pattern {
         SurfacePattern::Var(name) => name.clone(),
         SurfacePattern::Pair(left, right) => {
-            format!("({}, {})", format_pattern_raw(left), format_pattern_raw(right))
+            format!(
+                "({}, {})",
+                format_pattern_raw(left),
+                format_pattern_raw(right)
+            )
         }
         SurfacePattern::Wildcard => "_".to_string(),
         SurfacePattern::Annotated(inner, ty) => {
-            format!("({} : {})", format_pattern_raw(inner), format_cat_type_surface(ty))
+            format!(
+                "({} : {})",
+                format_pattern_raw(inner),
+                format_cat_type_surface(ty)
+            )
         }
     }
 }
@@ -2414,12 +2431,14 @@ fn cat_type_to_surface_expr(ty: &CatType) -> Expr {
     match ty {
         CatType::Base(name) | CatType::Var(name) => Expr::var(name.clone()),
         CatType::Opposite(inner) => Expr::opposite(cat_type_to_surface_expr(inner)),
-        CatType::FunCat(parameter, result) => {
-            Expr::arrow(cat_type_to_surface_expr(parameter), cat_type_to_surface_expr(result))
-        }
-        CatType::Product(left, right) => {
-            Expr::product(cat_type_to_surface_expr(left), cat_type_to_surface_expr(right))
-        }
+        CatType::FunCat(parameter, result) => Expr::arrow(
+            cat_type_to_surface_expr(parameter),
+            cat_type_to_surface_expr(result),
+        ),
+        CatType::Product(left, right) => Expr::product(
+            cat_type_to_surface_expr(left),
+            cat_type_to_surface_expr(right),
+        ),
         CatType::Top => Expr::Top,
     }
 }
@@ -2474,12 +2493,7 @@ fn looks_like_malformed_binder_group(ty: &str) -> bool {
 
         if depth == 0 {
             let followed_by_arrow = tokens.get(j + 1).map(|tok| tok.text.as_str()) == Some("->");
-            if followed_by_arrow
-                && !has_colon
-                && !has_comma
-                && simple_group
-                && ident_count >= 3
-            {
+            if followed_by_arrow && !has_colon && !has_comma && simple_group && ident_count >= 3 {
                 return true;
             }
             i = j + 1;
@@ -2656,8 +2670,12 @@ fn canonical_identifier(input: &str) -> String {
     for ch in input.chars() {
         let mapped = match ch {
             '\u{0300}'..='\u{036F}' => continue,
-            'á' | 'à' | 'â' | 'ä' | 'ã' | 'å' | 'ā' | 'ă' | 'ą' | 'ǎ' | 'ȧ' | 'ạ' => 'a',
-            'Á' | 'À' | 'Â' | 'Ä' | 'Ã' | 'Å' | 'Ā' | 'Ă' | 'Ą' | 'Ǎ' | 'Ȧ' | 'Ạ' => 'A',
+            'á' | 'à' | 'â' | 'ä' | 'ã' | 'å' | 'ā' | 'ă' | 'ą' | 'ǎ' | 'ȧ' | 'ạ' => {
+                'a'
+            }
+            'Á' | 'À' | 'Â' | 'Ä' | 'Ã' | 'Å' | 'Ā' | 'Ă' | 'Ą' | 'Ǎ' | 'Ȧ' | 'Ạ' => {
+                'A'
+            }
             'é' | 'è' | 'ê' | 'ë' | 'ē' | 'ĕ' | 'ė' | 'ę' | 'ě' | 'ẹ' => 'e',
             'É' | 'È' | 'Ê' | 'Ë' | 'Ē' | 'Ĕ' | 'Ė' | 'Ę' | 'Ě' | 'Ẹ' => 'E',
             'í' | 'ì' | 'î' | 'ï' | 'ī' | 'ĭ' | 'į' | 'ǐ' | 'ị' => 'i',

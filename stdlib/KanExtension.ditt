@@ -1,0 +1,33 @@
+module Std.KanExtension where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) → D
+  P : (x : C) → Prop
+
+// Right Kan extension of P along F (Paper Example 6.3, pointwise formula):
+// (Ran_F P)(y) = ∫ (x : C). ((y →[D] F x) → P x)
+ran (y : D) : Prop =
+  ∫ (x : C). ((y →[D] F x) → P x)
+
+// Left Kan extension of P along F (Paper Example D.1, pointwise formula):
+// (Lan_F P)(y) = ∫^ (x : C). ((F x →[D] y) × P x)
+lan (y : D) : Prop =
+  ∫^ (x : C). ((F x →[D] y) × P x)
+
+// Unit of the Ran adjunction: P x → Ran_F P (F x)
+// Given px : P x, for each z : C and f : F x →[D] F z,
+// transport px along the induced morphism.
+ran_unit (x : C) (px : P x) : ran (F x) =
+  λz. λf. (J (λw. λpw. pw) [f]) px
+
+// Counit of the Ran adjunction: Ran_F P (F x) → P x
+// Instantiate the ∫ at z = x with refl (F x).
+ran_counit (x : C) (phi : ran (F x)) : P x =
+  phi x (refl (F x))
+
+// Unit of the Lan adjunction: P x → Lan_F P (F x)
+// Construct a ∫^ witness at z = x with (refl (F x), px).
+lan_unit (x : C) (px : P x) : lan (F x) =
+  ∫^ (λz. (refl (F x), px))

@@ -1,0 +1,34 @@
+module Std.Limit where
+
+postulate
+  I : Cat
+  C : Cat
+  F : (i : I) → C
+  L : C
+
+// Limit cone: a family of morphisms from c to each F i, natural in i.
+// A cone over F with apex c is an element of ∫ (i : I). (c →[C] F i).
+limit_cone (c : C) : Prop = ∫ (i : I). (c →[C] F i)
+
+// Colimit cocone: a family of morphisms from each F i to c, natural in i.
+colimit_cocone (c : C) : Prop = ∫ (i : I). (F i →[C] c)
+
+// Limit universal property: L is a limit of F iff the cone functor
+// is representable by L. Both directions of the isomorphism, natural in c.
+limit_property : Prop =
+  ∫ (c : C). (((c →[C] L) → limit_cone c) × (limit_cone c → (c →[C] L)))
+
+// Colimit universal property: L is a colimit of F iff the cocone functor
+// is representable by L. Both directions of the isomorphism, natural in c.
+colimit_property : Prop =
+  ∫ (c : C). (((L →[C] c) → colimit_cocone c) × (colimit_cocone c → (L →[C] c)))
+
+// Weighted limit: {W, F} = ∫ (i : I). (W i → P i) for weight W and diagram P.
+postulate
+  W : (i : I) → Prop
+  P : (i : I) → Prop
+
+weighted_limit : Prop = ∫ (i : I). (W i → P i)
+
+// Weighted colimit: W × P = ∫^ (i : I). (W i × P i)
+weighted_colimit : Prop = ∫^ (i : I). (W i × P i)

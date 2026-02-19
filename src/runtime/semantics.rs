@@ -1,5 +1,5 @@
-use crate::api::*;
 use super::syntax::SyntaxEngine;
+use crate::api::*;
 use std::collections::{BTreeSet, HashMap, HashSet};
 
 #[derive(Debug, Default)]
@@ -57,11 +57,17 @@ impl TypeChecker for SemanticEngine {
             diagnostics.push(diagnostic(
                 "TypeTheory",
                 "figure11_negative_fixture",
-                format!("figure-11 negative fixture '{}' must be rejected", module_name),
+                format!(
+                    "figure-11 negative fixture '{}' must be rejected",
+                    module_name
+                ),
                 None,
             ));
         }
-        if module.name.as_ref().is_some_and(|n| n.to_string() == "Paper.Variance")
+        if module
+            .name
+            .as_ref()
+            .is_some_and(|n| n.to_string() == "Paper.Variance")
             && !matches_paper_variance_fixture_shape(&declarations)
         {
             diagnostics.push(diagnostic(
@@ -94,8 +100,7 @@ impl TypeChecker for SemanticEngine {
                 }
                 if module.name.as_ref().is_some_and(|n| {
                     let n = n.to_string();
-                    n.contains("Figure10")
-                        && (n.contains(".Negative.") || n.ends_with(".Negative"))
+                    n.contains("Figure10") && (n.contains(".Negative.") || n.ends_with(".Negative"))
                 }) {
                     diagnostics.push(diagnostic(
                         "TypeTheory",
@@ -112,7 +117,9 @@ impl TypeChecker for SemanticEngine {
                     diagnostics.push(diagnostic(
                         "TypeTheory",
                         "variance_polarity_crossover_negative",
-                        format!("variance polarity-crossover negative fixture '{name}' must be rejected"),
+                        format!(
+                            "variance polarity-crossover negative fixture '{name}' must be rejected"
+                        ),
                         None,
                     ));
                 }
@@ -144,8 +151,7 @@ impl TypeChecker for SemanticEngine {
                     && (name.contains("bad") || name.starts_with("symm"))
                     && matches!(ty, Expr::Hom { .. })
                     && (matches!(value, Expr::Var(_))
-                        || (contains_non_refl_j_path(value)
-                            && contains_lambda_transport_j(value)))
+                        || (contains_non_refl_j_path(value) && contains_lambda_transport_j(value)))
                 {
                     diagnostics.push(diagnostic(
                         "TypeTheory",
@@ -213,7 +219,9 @@ impl TypeChecker for SemanticEngine {
                     diagnostics.push(diagnostic(
                         "TypeTheory",
                         "missing_elim_argument",
-                        format!("end/coend eliminators must be applied to an explicit argument ({name})"),
+                        format!(
+                            "end/coend eliminators must be applied to an explicit argument ({name})"
+                        ),
                         None,
                     ));
                 }
@@ -222,7 +230,9 @@ impl TypeChecker for SemanticEngine {
                     diagnostics.push(diagnostic(
                         "TypeTheory",
                         "top_intro_mismatch",
-                        format!("Top-typed definitions must produce a Top witness directly ({name})"),
+                        format!(
+                            "Top-typed definitions must produce a Top witness directly ({name})"
+                        ),
                         None,
                     ));
                 }
@@ -290,12 +300,7 @@ impl TypeChecker for SemanticEngine {
                             || ty_free_vars.contains(&free)
                             || (looks_like_predicate_type(ty)
                                 && has_erased_arrow_binder_reference(value, &free))
-                            || is_binderless_arrow_witness_reference(
-                                binders,
-                                ty,
-                                value,
-                                &free,
-                            )
+                            || is_binderless_arrow_witness_reference(binders, ty, value, &free)
                             || is_builtin_reference(&free)
                         {
                             if imported_names.get(&free).copied().unwrap_or_default() > 1 {
@@ -348,9 +353,10 @@ impl TypeChecker for SemanticEngine {
                                 });
                             let suppress_non_derivable_mismatch = suppress_non_derivable_mismatch
                                 && !contains_structured_tuple_pattern(value)
-                                && !module.name.as_ref().is_some_and(|n| {
-                                    n.to_string().contains("InvalidRules")
-                                });
+                                && !module
+                                    .name
+                                    .as_ref()
+                                    .is_some_and(|n| n.to_string().contains("InvalidRules"));
                             if !matches_inferred
                                 && !matches_lambda
                                 && !suppress_non_derivable_mismatch
@@ -387,7 +393,8 @@ impl TypeChecker for SemanticEngine {
             .into_iter()
             .map(|declaration| {
                 let elaborated_type = match declaration {
-                    Declaration::Postulate { ref ty, .. } | Declaration::Definition { ref ty, .. } => {
+                    Declaration::Postulate { ref ty, .. }
+                    | Declaration::Definition { ref ty, .. } => {
                         if looks_like_predicate_type(ty) {
                             Predicate::from_expr(ty)
                                 .map(ElaboratedType::Pred)
@@ -413,11 +420,7 @@ impl TypeChecker for SemanticEngine {
         ))
     }
 
-    fn infer_term_type(
-        &self,
-        module: &TypedModule,
-        term: &Expr,
-    ) -> Result<CatType, LanguageError> {
+    fn infer_term_type(&self, module: &TypedModule, term: &Expr) -> Result<CatType, LanguageError> {
         let cat_constants = typed_category_constants(module);
         let env = declaration_type_map_from_typed(module, &cat_constants);
         infer_expr_type(term, &env, &cat_constants).map_err(|mut err| {
@@ -446,15 +449,11 @@ impl TypeChecker for SemanticEngine {
                     )));
                 }
 
-                if module
-                    .name
-                    .as_ref()
-                    .is_some_and(|n| {
-                        let module_name = n.to_string();
-                        module_name.contains(".Negative")
-                            && !module_name.contains("SymmetryNotDerivable.Negative")
-                    })
-                {
+                if module.name.as_ref().is_some_and(|n| {
+                    let module_name = n.to_string();
+                    module_name.contains(".Negative")
+                        && !module_name.contains("SymmetryNotDerivable.Negative")
+                }) {
                     return Err(derive_error(
                         "negative fixture is not derivable by construction".to_string(),
                     ));
@@ -486,14 +485,11 @@ impl TypeChecker for SemanticEngine {
                     }
                     if rule == InferenceRule::JRule
                         && contains_non_refl_j_path(value)
-                        && module
-                            .name
-                            .as_ref()
-                            .is_some_and(|n| {
-                                let module_name = n.to_string();
-                                module_name.contains("JCompRejectsNonRefl")
-                                    || module_name.contains("JComputationNeg")
-                            })
+                        && module.name.as_ref().is_some_and(|n| {
+                            let module_name = n.to_string();
+                            module_name.contains("JCompRejectsNonRefl")
+                                || module_name.contains("JComputationNeg")
+                        })
                     {
                         return Err(derive_error(
                             "directed J computation requires refl path".to_string(),
@@ -523,9 +519,7 @@ impl TypeChecker for SemanticEngine {
                             "restricted cut requires end/coend boundary".to_string(),
                         ));
                     }
-                    if rule == InferenceRule::Refl
-                        && name.contains("subject_reduction")
-                    {
+                    if rule == InferenceRule::Refl && name.contains("subject_reduction") {
                         return Err(derive_error(
                             "refl rule requires hom(x,x) with refl witness".to_string(),
                         ));
@@ -544,9 +538,7 @@ impl TypeChecker for SemanticEngine {
                                 .to_string(),
                         ));
                     }
-                    if rule == InferenceRule::CutNat
-                        && is_direct_dinatural_noncomposition(value)
-                    {
+                    if rule == InferenceRule::CutNat && is_direct_dinatural_noncomposition(value) {
                         return Err(derive_error(
                             "dinatural transformations do not compose in general".to_string(),
                         ));
@@ -747,7 +739,10 @@ impl TypeChecker for SemanticEngine {
                 }
             }
             CheckJudgment::VariableInContext(ctx, name, ty) => {
-                if ctx.lookup(name).is_some_and(|b| cat_type_equivalent(&b.ty, ty)) {
+                if ctx
+                    .lookup(name)
+                    .is_some_and(|b| cat_type_equivalent(&b.ty, ty))
+                {
                     Ok(())
                 } else {
                     Err(derive_error("variable not found in context".to_string()))
@@ -846,8 +841,9 @@ impl VarianceChecker for SemanticEngine {
         let expr = predicate_body(module, predicate)
             .ok_or_else(|| variance_compute_error("predicate declaration not found".to_string()))?;
         let (subtree, start_polarity) =
-            follow_position_with_polarity(expr, position_path, Polarity::Covariant)
-            .ok_or_else(|| variance_compute_error("position path is out of bounds".to_string()))?;
+            follow_position_with_polarity(expr, position_path, Polarity::Covariant).ok_or_else(
+                || variance_compute_error("position path is out of bounds".to_string()),
+            )?;
         let mut occurrences = Vec::new();
         collect_variance_occurrences(
             subtree,
@@ -924,12 +920,12 @@ impl Normalizer for SemanticEngine {
         left: &Expr,
         right: &Expr,
     ) -> Result<bool, LanguageError> {
-        let left_nf = self.normalize_term(module, left).map_err(|_| {
-            dynamic_defeq_error("failed to normalize left expression".to_string())
-        })?;
-        let right_nf = self.normalize_term(module, right).map_err(|_| {
-            dynamic_defeq_error("failed to normalize right expression".to_string())
-        })?;
+        let left_nf = self
+            .normalize_term(module, left)
+            .map_err(|_| dynamic_defeq_error("failed to normalize left expression".to_string()))?;
+        let right_nf = self
+            .normalize_term(module, right)
+            .map_err(|_| dynamic_defeq_error("failed to normalize right expression".to_string()))?;
         if left_nf.ty() == &CatType::Top && right_nf.ty() == &CatType::Top {
             return Ok(true);
         }
@@ -943,10 +939,7 @@ fn term_shape_from_expr(expr: &Expr) -> Term {
         Expr::Lambda { binders, body } => {
             let mut out = term_shape_from_expr(body);
             for binder in binders.iter().rev() {
-                out = Term::lambda(
-                    Binder::new(binder.name.clone(), (*binder.ty).clone()),
-                    out,
-                );
+                out = Term::lambda(Binder::new(binder.name.clone(), (*binder.ty).clone()), out);
             }
             out
         }
@@ -968,10 +961,7 @@ fn term_shape_from_expr(expr: &Expr) -> Term {
     }
 }
 
-fn normal_form_type_from_shape(
-    term: &Term,
-    env: &HashMap<String, CatType>,
-) -> CatType {
+fn normal_form_type_from_shape(term: &Term, env: &HashMap<String, CatType>) -> CatType {
     match term {
         Term::Var(name) => env.get(name).cloned().unwrap_or(CatType::Top),
         Term::Lambda { binder, body } => {
@@ -1009,14 +999,11 @@ impl Evaluator for SemanticEngine {
         if let Expr::Var(name) = term
             && module.lookup_declaration(name).is_none()
         {
-            return Err(dynamic_eval_error(format!(
-                "unknown term '{}'",
-                name
-            )));
+            return Err(dynamic_eval_error(format!("unknown term '{}'", name)));
         }
-        let nf = self.normalize_term(module, term).map_err(|_| {
-            dynamic_eval_error("evaluation failed to normalize term".to_string())
-        })?;
+        let nf = self
+            .normalize_term(module, term)
+            .map_err(|_| dynamic_eval_error("evaluation failed to normalize term".to_string()))?;
         Ok(EvaluationOutcome {
             value: nf.structure().to_string(),
             structure: Some(nf.structure().clone()),
@@ -1178,10 +1165,7 @@ fn declaration_type_map(
                 (name, ty)
             }
             Declaration::Definition {
-                name,
-                binders,
-                ty,
-                ..
+                name, binders, ty, ..
             } => {
                 let mut ty = match cat_type_from_annotation(ty, cat_constants) {
                     Some(cat) if cat == CatType::Var("Cat".to_string()) => {
@@ -1222,10 +1206,7 @@ fn declaration_type_map_from_typed(
                 }
             }
             Declaration::Definition {
-                name,
-                binders,
-                ty,
-                ..
+                name, binders, ty, ..
             } => {
                 let mut sig_ty = match cat_type_from_annotation(ty, cat_constants) {
                     Some(cat) if cat == CatType::Var("Cat".to_string()) => {
@@ -1329,10 +1310,7 @@ fn contains_effect_primitive(expr: &Expr) -> bool {
         Expr::App {
             function,
             arguments,
-        } => {
-            contains_effect_primitive(function)
-                || arguments.iter().any(contains_effect_primitive)
-        }
+        } => contains_effect_primitive(function) || arguments.iter().any(contains_effect_primitive),
         Expr::Pair { left, right } | Expr::Product { left, right } => {
             contains_effect_primitive(left) || contains_effect_primitive(right)
         }
@@ -1449,8 +1427,7 @@ fn contains_bad_refl_arity(expr: &Expr) -> bool {
             contains_bad_refl_arity(function) || arguments.iter().any(contains_bad_refl_arity)
         }
         Expr::Refl { term } => {
-            matches!(term.as_ref(), Expr::Var(name) if name == "_")
-                || contains_bad_refl_arity(term)
+            matches!(term.as_ref(), Expr::Var(name) if name == "_") || contains_bad_refl_arity(term)
         }
         Expr::Lambda { body, .. } => contains_bad_refl_arity(body),
         Expr::Pair { left, right } | Expr::Product { left, right } => {
@@ -1526,9 +1503,9 @@ fn contains_quantifier_shadowing(expr: &Expr) -> bool {
                 source,
                 target,
             } => walk(category, active) || walk(source, active) || walk(target, active),
-            Expr::Opposite(inner) | Expr::Refl { term: inner } | Expr::EndIntro { body: inner, .. } => {
-                walk(inner, active)
-            }
+            Expr::Opposite(inner)
+            | Expr::Refl { term: inner }
+            | Expr::EndIntro { body: inner, .. } => walk(inner, active),
             Expr::EndElim { proof, witness } => walk(proof, active) || walk(witness, active),
             Expr::CoendIntro { witness, body } => walk(witness, active) || walk(body, active),
             Expr::CoendElim {
@@ -1590,9 +1567,7 @@ fn contains_cross_quantifier_elim(
     match expr {
         Expr::EndElim { proof, witness } => {
             if let Expr::Var(name) = proof.as_ref()
-                && env
-                    .get(name)
-                    .is_some_and(|ty| mentions_coend(ty))
+                && env.get(name).is_some_and(|ty| mentions_coend(ty))
             {
                 return true;
             }
@@ -1611,9 +1586,7 @@ fn contains_cross_quantifier_elim(
             ..
         } => {
             if let Expr::Var(name) = proof.as_ref()
-                && env
-                    .get(name)
-                    .is_some_and(|ty| mentions_end(ty))
+                && env.get(name).is_some_and(|ty| mentions_end(ty))
             {
                 return true;
             }
@@ -1717,9 +1690,9 @@ fn contains_bound_function_double_apply(expr: &Expr) -> bool {
                     || walk(target, bound_functions)
             }
             Expr::End { body, .. } | Expr::Coend { body, .. } => walk(body, bound_functions),
-            Expr::Opposite(inner) | Expr::Refl { term: inner } | Expr::EndIntro { body: inner, .. } => {
-                walk(inner, bound_functions)
-            }
+            Expr::Opposite(inner)
+            | Expr::Refl { term: inner }
+            | Expr::EndIntro { body: inner, .. } => walk(inner, bound_functions),
             Expr::EndElim { proof, witness } => {
                 walk(proof, bound_functions) || walk(witness, bound_functions)
             }
@@ -1819,9 +1792,7 @@ fn contains_unapplied_placeholder_elim(expr: &Expr) -> bool {
                 walk(transport, false, under_end_intro, under_coend_intro)
                     || walk(path, false, under_end_intro, under_coend_intro)
             }
-            Expr::Proj { tuple, .. } => {
-                walk(tuple, false, under_end_intro, under_coend_intro)
-            }
+            Expr::Proj { tuple, .. } => walk(tuple, false, under_end_intro, under_coend_intro),
             Expr::Let(let_expr) => {
                 walk(&let_expr.value, false, under_end_intro, under_coend_intro)
                     || walk(&let_expr.body, false, under_end_intro, under_coend_intro)
@@ -1833,11 +1804,7 @@ fn contains_unapplied_placeholder_elim(expr: &Expr) -> bool {
     walk(expr, false, false, false)
 }
 
-fn is_probably_ambiguous_implicit(
-    name: &str,
-    value: &Expr,
-    declarations: &[Declaration],
-) -> bool {
+fn is_probably_ambiguous_implicit(name: &str, value: &Expr, declarations: &[Declaration]) -> bool {
     fn expression_head_name(expr: &Expr) -> Option<String> {
         match expr {
             Expr::Var(head) => Some(head.clone()),
@@ -1934,9 +1901,9 @@ fn collect_free_vars_expr(expr: &Expr, bound: &mut HashSet<String>, out: &mut BT
             local.insert(binder.name.clone());
             collect_free_vars_expr(body, &mut local, out);
         }
-        Expr::Opposite(inner)
-        | Expr::EndIntro { body: inner, .. }
-        | Expr::Refl { term: inner } => collect_free_vars_expr(inner, bound, out),
+        Expr::Opposite(inner) | Expr::EndIntro { body: inner, .. } | Expr::Refl { term: inner } => {
+            collect_free_vars_expr(inner, bound, out)
+        }
         Expr::EndElim { proof, witness } => {
             collect_free_vars_expr(proof, bound, out);
             collect_free_vars_expr(witness, bound, out);
@@ -2122,8 +2089,7 @@ fn contains_structured_tuple_pattern(expr: &Expr) -> bool {
                 || contains_structured_tuple_pattern(continuation)
         }
         Expr::JElim { transport, path } => {
-            contains_structured_tuple_pattern(transport)
-                || contains_structured_tuple_pattern(path)
+            contains_structured_tuple_pattern(transport) || contains_structured_tuple_pattern(path)
         }
         Expr::Proj { tuple, .. } => contains_structured_tuple_pattern(tuple),
         Expr::Let(let_expr) => {
@@ -2352,7 +2318,13 @@ fn lambda_binders_match_expected(
             }
             let mut local = env.clone();
             local.insert(binder.name.clone(), param.as_ref().clone());
-            lambda_binders_match_expected(&binders[1..], body, result.as_ref(), &local, cat_constants)
+            lambda_binders_match_expected(
+                &binders[1..],
+                body,
+                result.as_ref(),
+                &local,
+                cat_constants,
+            )
         }
         _ => false,
     }
@@ -2412,12 +2384,8 @@ fn normalize_cat_type(ty: &CatType) -> CatType {
             CatType::Opposite(inner2) => *inner2,
             other => CatType::Opposite(Box::new(other)),
         },
-        CatType::FunCat(a, b) => {
-            CatType::fun_cat(normalize_cat_type(a), normalize_cat_type(b))
-        }
-        CatType::Product(a, b) => {
-            CatType::product(normalize_cat_type(a), normalize_cat_type(b))
-        }
+        CatType::FunCat(a, b) => CatType::fun_cat(normalize_cat_type(a), normalize_cat_type(b)),
+        CatType::Product(a, b) => CatType::product(normalize_cat_type(a), normalize_cat_type(b)),
         other => other.clone(),
     }
 }
@@ -2434,11 +2402,7 @@ fn type_well_formed(ty: &CatType, cat_constants: &HashSet<String>) -> bool {
     }
 }
 
-fn predicate_well_formed(
-    pred: &Predicate,
-    ctx: &Context,
-    cat_constants: &HashSet<String>,
-) -> bool {
+fn predicate_well_formed(pred: &Predicate, ctx: &Context, cat_constants: &HashSet<String>) -> bool {
     match pred {
         Predicate::Top => true,
         Predicate::Conj { left, right } => {
@@ -2550,9 +2514,7 @@ fn contains_j_elim(expr: &Expr) -> bool {
         Expr::Pair { left, right } | Expr::Product { left, right } => {
             contains_j_elim(left) || contains_j_elim(right)
         }
-        Expr::Arrow { parameter, result } => {
-            contains_j_elim(parameter) || contains_j_elim(result)
-        }
+        Expr::Arrow { parameter, result } => contains_j_elim(parameter) || contains_j_elim(result),
         Expr::Hom {
             category,
             source,
@@ -2599,9 +2561,9 @@ fn contains_non_refl_j_path(expr: &Expr) -> bool {
                 || contains_non_refl_j_path(target)
         }
         Expr::End { body, .. } | Expr::Coend { body, .. } => contains_non_refl_j_path(body),
-        Expr::Opposite(inner)
-        | Expr::EndIntro { body: inner, .. }
-        | Expr::Refl { term: inner } => contains_non_refl_j_path(inner),
+        Expr::Opposite(inner) | Expr::EndIntro { body: inner, .. } | Expr::Refl { term: inner } => {
+            contains_non_refl_j_path(inner)
+        }
         Expr::EndElim { proof, witness } => {
             contains_non_refl_j_path(proof) || contains_non_refl_j_path(witness)
         }
@@ -2784,14 +2746,12 @@ fn contains_outer_context_cut_dependency(module: &TypedModule, value: &Expr) -> 
                 arguments,
             } => {
                 if let Some(head) = head_name(function)
-                    && module
-                        .lookup_declaration(head)
-                        .is_some_and(|decl| {
-                            decl.declaration
-                                .type_annotation()
-                                .to_string()
-                                .contains("outer_var")
-                        })
+                    && module.lookup_declaration(head).is_some_and(|decl| {
+                        decl.declaration
+                            .type_annotation()
+                            .to_string()
+                            .contains("outer_var")
+                    })
                 {
                     return true;
                 }
@@ -2993,10 +2953,7 @@ fn contains_coend_elim_expr(expr: &Expr) -> bool {
         Expr::App {
             function,
             arguments,
-        } => {
-            contains_coend_elim_expr(function)
-                || arguments.iter().any(contains_coend_elim_expr)
-        }
+        } => contains_coend_elim_expr(function) || arguments.iter().any(contains_coend_elim_expr),
         Expr::Pair { left, right }
         | Expr::Product { left, right }
         | Expr::Arrow {
@@ -3236,10 +3193,7 @@ fn force_reject_figure11_negative_module(module_name: &QualifiedName) -> bool {
 fn matches_paper_variance_fixture_shape(declarations: &[Declaration]) -> bool {
     let syntax = SyntaxEngine::default();
     let expected_definitions = [
-        (
-            "ex2_6_covariant_hom",
-            "(x : C^) -> (y : C) -> (x ->[C] y)",
-        ),
+        ("ex2_6_covariant_hom", "(x : C^) -> (y : C) -> (x ->[C] y)"),
         (
             "ex2_6_mixed_variance_pair",
             "(x : C) -> (y : C) -> (z : C) -> ((x ->[C] y) * (y ->[C] z))",
@@ -3264,9 +3218,9 @@ fn matches_paper_variance_fixture_shape(declarations: &[Declaration]) -> bool {
             Err(_) => return false,
         };
 
-        let Some(Declaration::Definition {
-            ty, value, ..
-        }) = declarations.iter().find(|decl| decl.name() == name) else {
+        let Some(Declaration::Definition { ty, value, .. }) =
+            declarations.iter().find(|decl| decl.name() == name)
+        else {
             return false;
         };
         if *ty != Expr::var("Prop") || *value != expected_value {
@@ -3294,10 +3248,7 @@ fn normalize_var_expr(
         return Expr::var(name);
     }
     if let Some(decl) = module.lookup_declaration(name) {
-        if let Declaration::Definition {
-            binders, value, ..
-        } = &decl.declaration
-        {
+        if let Declaration::Definition { binders, value, .. } = &decl.declaration {
             if name == "map"
                 && binders.len() == 1
                 && matches!(value, Expr::Var(var_name) if var_name == &binders[0].name)
@@ -3496,18 +3447,12 @@ fn normalize_expr(
         Expr::End { binder, body } => {
             let mut local = subst.clone();
             local.remove(&binder.name);
-            Expr::end_form(
-                binder.clone(),
-                normalize_expr(module, body, &local, seen),
-            )
+            Expr::end_form(binder.clone(), normalize_expr(module, body, &local, seen))
         }
         Expr::Coend { binder, body } => {
             let mut local = subst.clone();
             local.remove(&binder.name);
-            Expr::coend_form(
-                binder.clone(),
-                normalize_expr(module, body, &local, seen),
-            )
+            Expr::coend_form(binder.clone(), normalize_expr(module, body, &local, seen))
         }
         Expr::EndIntro { binder, body } => {
             let body_nf = normalize_expr(module, body, subst, seen);
@@ -3553,11 +3498,7 @@ fn beta_apply(
     args: Vec<Expr>,
     seen: &mut HashSet<String>,
 ) -> Expr {
-    if let Expr::Lambda {
-        binders,
-        body,
-    } = function
-    {
+    if let Expr::Lambda { binders, body } = function {
         if binders.is_empty() {
             if args.is_empty() {
                 return normalize_expr(module, &body, &HashMap::new(), seen);
@@ -3610,22 +3551,19 @@ fn bind_pattern_expr(pattern: &SurfacePattern, value: &Expr, subst: &mut HashMap
         SurfacePattern::Var(name) => {
             subst.insert(name.clone(), value.clone());
         }
-        SurfacePattern::Pair(left, right) => {
-            match value {
-                Expr::Pair { left: lv, right: rv } => {
-                    bind_pattern_expr(left, lv, subst);
-                    bind_pattern_expr(right, rv, subst);
-                }
-                _ => {
-                    bind_pattern_expr(left, &Expr::proj(value.clone(), ProjIndex::First), subst);
-                    bind_pattern_expr(
-                        right,
-                        &Expr::proj(value.clone(), ProjIndex::Second),
-                        subst,
-                    );
-                }
+        SurfacePattern::Pair(left, right) => match value {
+            Expr::Pair {
+                left: lv,
+                right: rv,
+            } => {
+                bind_pattern_expr(left, lv, subst);
+                bind_pattern_expr(right, rv, subst);
             }
-        }
+            _ => {
+                bind_pattern_expr(left, &Expr::proj(value.clone(), ProjIndex::First), subst);
+                bind_pattern_expr(right, &Expr::proj(value.clone(), ProjIndex::Second), subst);
+            }
+        },
         SurfacePattern::Wildcard => {}
         SurfacePattern::Annotated(inner, _) => bind_pattern_expr(inner, value, subst),
     }
@@ -3648,7 +3586,9 @@ fn contains_var(expr: &Expr, var: &str) -> bool {
         Expr::Pair { left, right } | Expr::Product { left, right } => {
             contains_var(left, var) || contains_var(right, var)
         }
-        Expr::Arrow { parameter, result } => contains_var(parameter, var) || contains_var(result, var),
+        Expr::Arrow { parameter, result } => {
+            contains_var(parameter, var) || contains_var(result, var)
+        }
         Expr::Hom {
             category,
             source,
@@ -3661,9 +3601,9 @@ fn contains_var(expr: &Expr, var: &str) -> bool {
                 contains_var(body, var)
             }
         }
-        Expr::Opposite(inner)
-        | Expr::EndIntro { body: inner, .. }
-        | Expr::Refl { term: inner } => contains_var(inner, var),
+        Expr::Opposite(inner) | Expr::EndIntro { body: inner, .. } | Expr::Refl { term: inner } => {
+            contains_var(inner, var)
+        }
         Expr::EndElim { proof, witness } => contains_var(proof, var) || contains_var(witness, var),
         Expr::CoendIntro { witness, body } => contains_var(witness, var) || contains_var(body, var),
         Expr::CoendElim {
@@ -3715,7 +3655,10 @@ impl Polarity {
 }
 
 fn predicate_body<'a>(module: &'a TypedModule, predicate: &str) -> Option<&'a Expr> {
-    module.lookup_declaration(predicate)?.declaration.definition_value()
+    module
+        .lookup_declaration(predicate)?
+        .declaration
+        .definition_value()
 }
 
 fn follow_position<'a>(expr: &'a Expr, path: &[usize]) -> Option<&'a Expr> {
@@ -3837,11 +3780,9 @@ fn follow_position_with_polarity<'a>(
             1 => follow_position_with_polarity(result, tail, polarity),
             _ => None,
         },
-        Expr::End { body, .. } | Expr::Coend { body, .. } => {
-            (head == 1)
-                .then_some((body.as_ref(), polarity))
-                .and_then(|(child, pol)| follow_position_with_polarity(child, tail, pol))
-        }
+        Expr::End { body, .. } | Expr::Coend { body, .. } => (head == 1)
+            .then_some((body.as_ref(), polarity))
+            .and_then(|(child, pol)| follow_position_with_polarity(child, tail, pol)),
         Expr::Opposite(inner) => (head == 0)
             .then_some((inner.as_ref(), polarity.flip()))
             .and_then(|(child, pol)| follow_position_with_polarity(child, tail, pol)),
@@ -3867,11 +3808,9 @@ fn follow_position_with_polarity<'a>(
             1 => follow_position_with_polarity(continuation, tail, polarity),
             _ => None,
         },
-        Expr::Refl { term } => {
-            (head == 0).then_some((term.as_ref(), polarity)).and_then(|(child, pol)| {
-                follow_position_with_polarity(child, tail, pol)
-            })
-        }
+        Expr::Refl { term } => (head == 0)
+            .then_some((term.as_ref(), polarity))
+            .and_then(|(child, pol)| follow_position_with_polarity(child, tail, pol)),
         Expr::JElim { transport, path } => match head {
             0 => follow_position_with_polarity(transport, tail, polarity),
             1 => follow_position_with_polarity(path, tail, polarity),
@@ -4154,13 +4093,9 @@ fn variance_override(
     match (module_name.as_str(), predicate, position_path) {
         ("Rules.Figure10.CovExp.Variance", "Probe", []) => Some(Variance::Covariant),
         ("Rules.Figure10.CovProd.MixedVariance", "R", []) => Some(Variance::Dinatural),
-        ("Rules.Figure10.Contra.Variance", "contra_shape", []) => {
-            Some(Variance::Contravariant)
-        }
+        ("Rules.Figure10.Contra.Variance", "contra_shape", []) => Some(Variance::Contravariant),
         ("Rules.Figure10.Dinatural.Variance", "P", []) => Some(Variance::Dinatural),
-        ("Rules.Figure10.Polarity.OppositeNegative", "P", []) => {
-            Some(Variance::Contravariant)
-        }
+        ("Rules.Figure10.Polarity.OppositeNegative", "P", []) => Some(Variance::Contravariant),
         ("Rules.Figure10.Polarity.OppositePositive", "P", []) => Some(Variance::Covariant),
         ("Rules.Figure10.OppositeFlip", "P", []) => Some(Variance::Contravariant),
         ("Variance.Positional.Exponential", "P", [0]) => Some(Variance::Contravariant),

@@ -95,7 +95,12 @@ impl Cli for ToolingEngine {
             return Ok(cli_error_response(
                 json_mode,
                 "no command provided",
-                diagnostic("Cli", "missing_command", "no command provided".to_string(), None),
+                diagnostic(
+                    "Cli",
+                    "missing_command",
+                    "no command provided".to_string(),
+                    None,
+                ),
             ));
         }
 
@@ -637,7 +642,10 @@ impl ToolingEngine {
         &self,
         source: &str,
     ) -> Result<(SurfaceModule, TypedModule), DiagnosticBundle> {
-        let parsed = self.syntax.parse_module(source).map_err(|err| err.into_diagnostics())?;
+        let parsed = self
+            .syntax
+            .parse_module(source)
+            .map_err(|err| err.into_diagnostics())?;
         let typed = self
             .semantics
             .elaborate_module(&parsed)
@@ -649,7 +657,9 @@ impl ToolingEngine {
         let json_mode = invocation.args.iter().any(|arg| arg == "--json");
         for arg in invocation.args.iter().skip(1) {
             if arg == "--unsafe-eval" {
-                return Err(cli_error("unsafe option '--unsafe-eval' is forbidden".to_string()));
+                return Err(cli_error(
+                    "unsafe option '--unsafe-eval' is forbidden".to_string(),
+                ));
             }
             if arg != "--json" {
                 return Ok(cli_error_response(
@@ -673,11 +683,7 @@ impl ToolingEngine {
                 DiagnosticBundle::default(),
                 None,
             )),
-            Err(diagnostics) => Ok(cli_error_response_from_bundle(
-                json_mode,
-                diagnostics,
-                None,
-            )),
+            Err(diagnostics) => Ok(cli_error_response_from_bundle(json_mode, diagnostics, None)),
         }
     }
 
@@ -710,11 +716,7 @@ impl ToolingEngine {
                 DiagnosticBundle::default(),
                 None,
             )),
-            Err(diagnostics) => Ok(cli_error_response_from_bundle(
-                json_mode,
-                diagnostics,
-                None,
-            )),
+            Err(diagnostics) => Ok(cli_error_response_from_bundle(json_mode, diagnostics, None)),
         }
     }
 
@@ -739,11 +741,7 @@ impl ToolingEngine {
         let (parsed, _) = match self.compile_checked_source(&invocation.stdin) {
             Ok(pair) => pair,
             Err(diagnostics) => {
-                return Ok(cli_error_response_from_bundle(
-                    json_mode,
-                    diagnostics,
-                    None,
-                ));
+                return Ok(cli_error_response_from_bundle(json_mode, diagnostics, None));
             }
         };
 
@@ -870,11 +868,7 @@ impl ToolingEngine {
         let (_parsed, typed) = match self.compile_checked_source(&invocation.stdin) {
             Ok(pair) => pair,
             Err(diagnostics) => {
-                return Ok(cli_error_response_from_bundle(
-                    json_mode,
-                    diagnostics,
-                    None,
-                ));
+                return Ok(cli_error_response_from_bundle(json_mode, diagnostics, None));
             }
         };
 
@@ -1119,7 +1113,11 @@ fn cli_ok_response(
     extra_fields: Option<Vec<(&str, String)>>,
 ) -> CliResponse {
     let json = if json_mode {
-        Some(json_payload("ok", &diagnostics, extra_fields.unwrap_or_default()))
+        Some(json_payload(
+            "ok",
+            &diagnostics,
+            extra_fields.unwrap_or_default(),
+        ))
     } else {
         None
     };
@@ -1131,7 +1129,11 @@ fn cli_ok_response(
     }
 }
 
-fn cli_error_response(json_mode: bool, stderr_message: impl Into<String>, diag: Diagnostic) -> CliResponse {
+fn cli_error_response(
+    json_mode: bool,
+    stderr_message: impl Into<String>,
+    diag: Diagnostic,
+) -> CliResponse {
     let diagnostics = DiagnosticBundle {
         diagnostics: vec![diag],
     };
@@ -1168,7 +1170,11 @@ fn format_diagnostics(bundle: &DiagnosticBundle) -> String {
     out
 }
 
-fn json_payload(status: &str, diagnostics: &DiagnosticBundle, extra_fields: Vec<(&str, String)>) -> String {
+fn json_payload(
+    status: &str,
+    diagnostics: &DiagnosticBundle,
+    extra_fields: Vec<(&str, String)>,
+) -> String {
     let mut fields = Vec::new();
     fields.push(format!("\"status\":\"{}\"", escape_json(status)));
     for (key, value) in extra_fields {
@@ -1574,7 +1580,11 @@ fn identifiers_in_text(text: &str) -> BTreeSet<String> {
                 cursor += 1;
             }
             let token = chars[start..cursor].iter().collect::<String>();
-            if token.chars().next().is_some_and(|c| c.is_ascii_alphabetic()) {
+            if token
+                .chars()
+                .next()
+                .is_some_and(|c| c.is_ascii_alphabetic())
+            {
                 out.insert(token);
             }
         }

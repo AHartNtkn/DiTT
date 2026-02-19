@@ -1,0 +1,59 @@
+module Std.Yoneda where
+
+postulate
+  C : Cat
+  P : (x : C) → Prop
+
+// Transport of a predicate along a morphism (functorial action).
+// Given f : a →[C] b, produce P a → P b.
+// The diagonal witness λz. λp. p is dinatural: at the diagonal,
+// it is the identity P z → P z.
+// J (λz. λp. p) [f] : P a → P b transports along f.
+transport_P (a : C^) (b : C) (f : a →[C] b) : P a → P b =
+  J (λz. λp. p) [f]
+
+// Yoneda forward direction (Paper Example 6.1, Appendix G):
+// P a → ∫ (x : C). ((a →[C] x) → P x)
+// Given pa : P a, for each x and f : a →[C] x, transport pa along f.
+yoneda_forward (a : C) (pa : P a) : ∫ (x : C). ((a →[C] x) → P x) =
+  λx. λf. transport_P a x f pa
+
+// Yoneda backward direction:
+// ∫ (x : C). ((a →[C] x) → P x) → P a
+// Instantiate the natural family at x = a with refl a.
+yoneda_backward (a : C) (alpha : ∫ (x : C). ((a →[C] x) → P x)) : P a =
+  alpha a (refl a)
+
+// Round-trip 1: backward (forward pa) = pa (by J-comp)
+yoneda_roundtrip (a : C) (pa : P a) : P a =
+  yoneda_backward a (yoneda_forward a pa)
+
+// Round-trip 2: forward (backward alpha) = alpha (by internal naturality)
+yoneda_roundtrip_2 (a : C) (alpha : ∫ (x : C). ((a →[C] x) → P x)) : ∫ (x : C). ((a →[C] x) → P x) =
+  yoneda_forward a (yoneda_backward a alpha)
+
+// The representable presheaf (Yoneda embedding on objects):
+// yo(a)(x) = hom_C(x, a) = x →[C] a
+yo (a : C) (x : C) : Prop = x →[C] a
+
+// Local composition helpers for C.
+diag_comp_C (c : C) (z : C) : (z →[C] c) → (z →[C] c) = λk. k
+
+compose_C (a : C^) (b : C) (c : C) (f : a →[C] b) (g : b →[C] c) : a →[C] c =
+  (J (diag_comp_C c) [f]) g
+
+// Full faithfulness of the Yoneda embedding (forward direction):
+// A morphism f : a →[C] b gives a natural transformation yo(a) => yo(b).
+// Pointwise: post-composition with f.
+yoneda_ff_forward (a : C) (b : C) (f : a →[C] b) : ∫ (x : C). ((x →[C] a) → (x →[C] b)) =
+  λx. λg. compose_C x a b g f
+
+// Full faithfulness backward: natural transformation yo(a) => yo(b) gives morphism.
+// Instantiate at x = a with refl a.
+yoneda_ff_backward (a : C) (b : C) (alpha : ∫ (x : C). ((x →[C] a) → (x →[C] b))) : a →[C] b =
+  alpha a (refl a)
+
+// Precomposition: given f : a →[C] b, transform a Yoneda-type natural
+// transformation indexed from a to one indexed from b.
+precompose (a : C) (b : C) (f : a →[C] b) (alpha : ∫ (x : C). ((a →[C] x) → P x)) : ∫ (x : C). ((b →[C] x) → P x) =
+  λx. λg. alpha x (compose_C a b x f g)

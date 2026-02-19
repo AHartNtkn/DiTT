@@ -1,0 +1,33 @@
+module Std.Codensity where
+
+postulate
+  C : Cat
+  P : (x : C) → Prop
+
+// The codensity "monad" at the predicate level.
+// For P : (x : C) → Prop, the codensity construction is:
+//   T(a) = ∫ (x : C). ((a →[C] x) → P x)
+// This is the right Kan extension of P along the identity (Ran_Id P),
+// and by the Yoneda lemma, T(a) ~= P(a).
+codensity (a : C) : Prop =
+  ∫ (x : C). ((a →[C] x) → P x)
+
+// Unit: P a → T(a)
+// Given pa : P a, for each x and f : a →[C] x, transport pa along f.
+// This is the reverse Yoneda direction.
+codensity_unit (a : C) (pa : P a) : codensity a =
+  λx. λf. (J (λz. λp. p) [f]) pa
+
+// Counit: T(a) → P a
+// Instantiate the ∫ at x = a with refl a.
+// This is the Yoneda evaluation direction.
+codensity_counit (a : C) (alpha : codensity a) : P a =
+  alpha a (refl a)
+
+// Join (multiplication): T(T(a)) → T(a)
+// T(T(a)) = ∫ (x : C). ((a →[C] x) → ∫ (y : C). ((x →[C] y) → P y))
+// Given alpha : T(T(a)), y : C, g : a →[C] y, we need P y.
+// Strategy: unpack alpha at x = a with refl a to get T(a),
+// then unpack T(a) at y with g.
+codensity_join (a : C) (alpha : ∫ (x : C). ((a →[C] x) → ∫ (y : C). ((x →[C] y) → P y))) : codensity a =
+  λy. λg. (alpha a (refl a)) y g

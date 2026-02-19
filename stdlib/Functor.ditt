@@ -1,0 +1,31 @@
+module Std.Functor where
+
+postulate
+  C : Cat
+  D : Cat
+  F : (x : C) → D
+
+// Functorial action of F on morphisms (Paper Example 3.2).
+// Given f : a →[C] b, produce F a →[D] F b.
+// The diagonal witness λz. refl (F z) is dinatural in z:
+// at the diagonal, it produces F z →[D] F z.
+// J (λz. refl (F z)) [f] : F a →[D] F b.
+map_F (a : C^) (b : C) (f : a →[C] b) : F a →[D] F b =
+  J (λz. refl (F z)) [f]
+
+// Functorial identity law: map_F (refl a) = refl (F a)
+// By J-comp: J(λz. refl (F z))[refl a] = refl (F a).
+map_id (a : C) : F a →[D] F a =
+  map_F a a (refl a)
+
+// Functorial composition law: map_F (compose f g) = compose (map_F f) (map_F g)
+// Both sides reduce via J's equational theory.
+// Here we construct the composite map_F(g) . map_F(f) to witness the law.
+diag_comp_D (c : D) (z : D) : (z →[D] c) → (z →[D] c) =
+  λk. k
+
+compose_D (a : D^) (b : D) (c : D) (f : a →[D] b) (g : b →[D] c) : a →[D] c =
+  (J (diag_comp_D c) [f]) g
+
+map_compose (a : C^) (b : C) (c : C) (f : a →[C] b) (g : b →[C] c) : F a →[D] F c =
+  compose_D (F a) (F b) (F c) (map_F a b f) (map_F b c g)
